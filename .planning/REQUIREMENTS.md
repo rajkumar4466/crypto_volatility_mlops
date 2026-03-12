@@ -10,7 +10,7 @@
 - [ ] **INFRA-01**: All AWS resources provisioned via Terraform (ECR, EC2, RDS, ElastiCache, Lambda, API Gateway, S3, DynamoDB, SNS, CloudWatch)
 - [ ] **INFRA-02**: EC2 user-data script configures 2-4GB swap before Airflow starts
 - [ ] **INFRA-03**: CloudWatch billing alarm triggers at $1 threshold before any resource creation
-- [ ] **INFRA-04**: docker-compose.yml for local development and testing of all components
+- [x] **INFRA-04**: docker-compose.yml for local development and testing of all components
 - [ ] **INFRA-05**: Destroy script (terraform destroy + cleanup of manually-created resources like snapshots, Elastic IPs)
 
 ### Data Pipeline
@@ -107,7 +107,7 @@
 | INFRA-01 | Phase 1 — Infrastructure Foundation | Pending |
 | INFRA-02 | Phase 1 — Infrastructure Foundation | Pending |
 | INFRA-03 | Phase 1 — Infrastructure Foundation | Pending |
-| INFRA-04 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-04 | Phase 1 — Infrastructure Foundation | Complete |
 | INFRA-05 | Phase 1 — Infrastructure Foundation | Pending |
 | DATA-01 | Phase 2 — Data and Feature Pipeline | Pending |
 | DATA-02 | Phase 2 — Data and Feature Pipeline | Pending |
