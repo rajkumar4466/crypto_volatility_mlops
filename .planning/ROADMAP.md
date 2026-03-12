@@ -105,11 +105,11 @@ Plans:
   3. An SNS email is received within minutes when drift is detected or accuracy drops below 55%
   4. The CloudWatch dashboard displays rolling_accuracy, drift_score, model_version, prediction_latency, and retrain_count over time
   5. A detected drift event triggers an Airflow DAG run via the Airflow REST API (drift → retrain loop is observable end-to-end)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: KS-test drift detection + rolling accuracy computation + CloudWatch custom metrics + SNS alerts + drift-triggered retraining via Airflow REST API
-- [ ] 06-02: CloudWatch dashboard with all metrics over time
+- [ ] 06-01-PLAN.md — KS-test drift detection, rolling accuracy, CloudWatch custom metrics (5 metrics), Airflow REST API retrain trigger (MON-01, MON-02, MON-03, MON-06)
+- [ ] 06-02-PLAN.md — Terraform monitoring module: SNS topic + email subscription + 2 CloudWatch alarms + 5-widget CloudWatch dashboard (MON-04, MON-05)
 
 ### Phase 7: CI/CD Pipeline
 **Goal**: Every PR runs lint and tests automatically; every merge to main builds a Docker image, pushes to ECR, and deploys to Lambda with a smoke test
