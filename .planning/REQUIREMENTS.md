@@ -104,52 +104,52 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 | Pending |
-| INFRA-02 | Phase 1 | Pending |
-| INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
-| INFRA-05 | Phase 1 | Pending |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
-| FEAT-01 | Phase 2 | Pending |
-| FEAT-02 | Phase 2 | Pending |
-| FEAT-03 | Phase 2 | Pending |
-| FEAT-04 | Phase 2 | Pending |
-| TRAIN-01 | Phase 3 | Pending |
-| TRAIN-02 | Phase 3 | Pending |
-| TRAIN-03 | Phase 3 | Pending |
-| TRAIN-04 | Phase 3 | Pending |
-| TRAIN-05 | Phase 3 | Pending |
-| REG-01 | Phase 3 | Pending |
-| REG-02 | Phase 3 | Pending |
-| REG-03 | Phase 3 | Pending |
-| SERV-01 | Phase 4 | Pending |
-| SERV-02 | Phase 4 | Pending |
-| SERV-03 | Phase 4 | Pending |
-| SERV-04 | Phase 4 | Pending |
-| SERV-05 | Phase 4 | Pending |
-| ORCH-01 | Phase 5 | Pending |
-| ORCH-02 | Phase 5 | Pending |
-| ORCH-03 | Phase 5 | Pending |
-| ORCH-04 | Phase 5 | Pending |
-| ORCH-05 | Phase 5 | Pending |
-| MON-01 | Phase 6 | Pending |
-| MON-02 | Phase 6 | Pending |
-| MON-03 | Phase 6 | Pending |
-| MON-04 | Phase 6 | Pending |
-| MON-05 | Phase 6 | Pending |
-| MON-06 | Phase 6 | Pending |
-| CICD-01 | Phase 7 | Pending |
-| CICD-02 | Phase 7 | Pending |
-| CICD-03 | Phase 7 | Pending |
+| INFRA-01 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-02 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-03 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-04 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-05 | Phase 1 — Infrastructure Foundation | Pending |
+| DATA-01 | Phase 2 — Data and Feature Pipeline | Pending |
+| DATA-02 | Phase 2 — Data and Feature Pipeline | Pending |
+| DATA-03 | Phase 2 — Data and Feature Pipeline | Pending |
+| DATA-04 | Phase 2 — Data and Feature Pipeline | Pending |
+| FEAT-01 | Phase 2 — Data and Feature Pipeline | Pending |
+| FEAT-02 | Phase 2 — Data and Feature Pipeline | Pending |
+| FEAT-03 | Phase 2 — Data and Feature Pipeline | Pending |
+| FEAT-04 | Phase 2 — Data and Feature Pipeline | Pending |
+| TRAIN-01 | Phase 3 — Model Training and Registry | Pending |
+| TRAIN-02 | Phase 3 — Model Training and Registry | Pending |
+| TRAIN-03 | Phase 3 — Model Training and Registry | Pending |
+| TRAIN-04 | Phase 3 — Model Training and Registry | Pending |
+| TRAIN-05 | Phase 3 — Model Training and Registry | Pending |
+| REG-01 | Phase 3 — Model Training and Registry | Pending |
+| REG-02 | Phase 3 — Model Training and Registry | Pending |
+| REG-03 | Phase 3 — Model Training and Registry | Pending |
+| SERV-01 | Phase 4 — Lambda Serving and API | Pending |
+| SERV-02 | Phase 4 — Lambda Serving and API | Pending |
+| SERV-03 | Phase 4 — Lambda Serving and API | Pending |
+| SERV-04 | Phase 4 — Lambda Serving and API | Pending |
+| SERV-05 | Phase 4 — Lambda Serving and API | Pending |
+| ORCH-01 | Phase 5 — Airflow DAG Orchestration | Pending |
+| ORCH-02 | Phase 5 — Airflow DAG Orchestration | Pending |
+| ORCH-03 | Phase 5 — Airflow DAG Orchestration | Pending |
+| ORCH-04 | Phase 5 — Airflow DAG Orchestration | Pending |
+| ORCH-05 | Phase 5 — Airflow DAG Orchestration | Pending |
+| MON-01 | Phase 6 — Monitoring and Drift Detection | Pending |
+| MON-02 | Phase 6 — Monitoring and Drift Detection | Pending |
+| MON-03 | Phase 6 — Monitoring and Drift Detection | Pending |
+| MON-04 | Phase 6 — Monitoring and Drift Detection | Pending |
+| MON-05 | Phase 6 — Monitoring and Drift Detection | Pending |
+| MON-06 | Phase 6 — Monitoring and Drift Detection | Pending |
+| CICD-01 | Phase 7 — CI/CD Pipeline | Pending |
+| CICD-02 | Phase 7 — CI/CD Pipeline | Pending |
+| CICD-03 | Phase 7 — CI/CD Pipeline | Pending |
 
 **Coverage:**
 - v1 requirements: 39 total
 - Mapped to phases: 39
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-12 after initial definition*
+*Last updated: 2026-03-12 after roadmap creation*
