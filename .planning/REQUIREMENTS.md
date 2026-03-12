@@ -22,10 +22,10 @@
 
 ### Feature Store
 
-- [ ] **FEAT-01**: Feast feature definitions for all 12 features (single source of truth)
-- [ ] **FEAT-02**: S3 offline store for historical features (Parquet, used by training)
-- [ ] **FEAT-03**: Redis online store via ElastiCache t3.micro (used by serving)
-- [ ] **FEAT-04**: Feature computation happens once in ingest, written to both stores — no duplication in training or serving code
+- [x] **FEAT-01**: Feast feature definitions for all 12 features (single source of truth)
+- [x] **FEAT-02**: S3 offline store for historical features (Parquet, used by training)
+- [x] **FEAT-03**: Redis online store via ElastiCache t3.micro (used by serving)
+- [x] **FEAT-04**: Feature computation happens once in ingest, written to both stores — no duplication in training or serving code
 
 ### Model Training
 
@@ -113,10 +113,10 @@
 | DATA-02 | Phase 2 — Data and Feature Pipeline | Complete |
 | DATA-03 | Phase 2 — Data and Feature Pipeline | Complete |
 | DATA-04 | Phase 2 — Data and Feature Pipeline | Complete |
-| FEAT-01 | Phase 2 — Data and Feature Pipeline | Pending |
-| FEAT-02 | Phase 2 — Data and Feature Pipeline | Pending |
-| FEAT-03 | Phase 2 — Data and Feature Pipeline | Pending |
-| FEAT-04 | Phase 2 — Data and Feature Pipeline | Pending |
+| FEAT-01 | Phase 2 — Data and Feature Pipeline | Complete |
+| FEAT-02 | Phase 2 — Data and Feature Pipeline | Complete |
+| FEAT-03 | Phase 2 — Data and Feature Pipeline | Complete |
+| FEAT-04 | Phase 2 — Data and Feature Pipeline | Complete |
 | TRAIN-01 | Phase 3 — Model Training and Registry | Pending |
 | TRAIN-02 | Phase 3 — Model Training and Registry | Pending |
 | TRAIN-03 | Phase 3 — Model Training and Registry | Pending |

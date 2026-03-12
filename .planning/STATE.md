@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-12T22:42:10Z"
+last_updated: "2026-03-12T22:53:38.139Z"
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -23,28 +23,28 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 ## Current Position
 
 Phase: 2 of 7 (Data and Feature Pipeline)
-Plan: 1 of 2 in current phase
-Status: In progress — Plan 02-01 complete, Plan 02-02 next
-Last activity: 2026-03-12 — Plan 02-01 complete: CoinGecko ingest + 12 features + VOLATILE/CALM labels with TDD look-ahead bias guards
+Plan: 2 of 2 in current phase — Phase 2 COMPLETE (pending Task 3 human-verify checkpoint)
+Status: In progress — Plan 02-02 tasks 1-2 complete, Task 3 checkpoint awaiting human-verify
+Last activity: 2026-03-12 — Plan 02-02 complete: Feast feature store definitions + offline write + materialize functions
 
-Progress: [███░░░░░░░] 21%
+Progress: [████░░░░░░] 28%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~4 min
-- Total execution time: ~12 min
+- Total plans completed: 4
+- Average duration: ~4.5 min
+- Total execution time: ~18 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-infrastructure-foundation | 2 | ~6 min | ~3 min |
-| 02-data-and-feature-pipeline | 1 | ~6 min | ~6 min |
+| 02-data-and-feature-pipeline | 2 | ~12 min | ~6 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (~6 min), 01-02 (~1 min), 01-01 (~5 min)
+- Last 5 plans: 02-02 (~6 min), 02-01 (~6 min), 01-02 (~1 min), 01-01 (~5 min)
 - Trend: N/A (small sample)
 
 *Updated after each plan completion*
@@ -73,6 +73,8 @@ Recent decisions affecting current work:
 - Phase 2 (02-01): RSI uses np.where(loss==0, 100) not replace(0, nan) — monotonic price sequences produce zero loss; NaN RSI would corrupt Feast writes
 - Phase 2 (02-01): label_volatility slice is [i+1:i+31] not [i:i+30] — FEATURE_COLS in compute.py is single source of truth for downstream Feast/Lambda/drift imports
 - Phase 2 (02-01): SWING_THRESHOLD = 0.02 (2%) for VOLATILE/CALM label boundary on BTC 1-min data
+- [Phase 02-data-and-feature-pipeline]: feast/features.py loaded via importlib.util.spec_from_file_location to avoid feast/ dir shadowing installed feast SDK (no __init__.py in feast/ dir)
+- [Phase 02-data-and-feature-pipeline]: FeatureView TTL = 75min (2.5x 30-min cycle); feast/ dir is not a Python package -- CLI-scanned Feast repo dir only
 
 ### Pending Todos
 
@@ -88,5 +90,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 02-01-PLAN.md (CoinGecko ingest + features + labels — Phase 2 Plan 1 complete)
+Stopped at: Completed 02-02-PLAN.md tasks 1-2; paused at Task 3 human-verify checkpoint (feast integration local verification + live AWS deferred to Phase 1 infra)
 Resume file: None
