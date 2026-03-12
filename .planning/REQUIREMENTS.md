@@ -15,10 +15,10 @@
 
 ### Data Pipeline
 
-- [ ] **DATA-01**: Ingest BTC 1-minute OHLCV candles from CoinGecko free API (no API key)
-- [ ] **DATA-02**: Compute 12 engineered features: volatility_10m, volatility_30m, volatility_ratio, rsi_14, volume_spike, volume_trend, price_range_30m, sma_10_vs_sma_30, max_drawdown_30m, candle_body_avg, hour_of_day, day_of_week
-- [ ] **DATA-03**: Label each sample: VOLATILE (>2% swing in next 30 min) or CALM
-- [ ] **DATA-04**: Time-ordered train/test split (no shuffle) to prevent look-ahead bias
+- [x] **DATA-01**: Ingest BTC 1-minute OHLCV candles from CoinGecko free API (no API key)
+- [x] **DATA-02**: Compute 12 engineered features: volatility_10m, volatility_30m, volatility_ratio, rsi_14, volume_spike, volume_trend, price_range_30m, sma_10_vs_sma_30, max_drawdown_30m, candle_body_avg, hour_of_day, day_of_week
+- [x] **DATA-03**: Label each sample: VOLATILE (>2% swing in next 30 min) or CALM
+- [x] **DATA-04**: Time-ordered train/test split (no shuffle) to prevent look-ahead bias
 
 ### Feature Store
 
@@ -109,10 +109,10 @@
 | INFRA-03 | Phase 1 — Infrastructure Foundation | Complete |
 | INFRA-04 | Phase 1 — Infrastructure Foundation | Complete |
 | INFRA-05 | Phase 1 — Infrastructure Foundation | Complete |
-| DATA-01 | Phase 2 — Data and Feature Pipeline | Pending |
-| DATA-02 | Phase 2 — Data and Feature Pipeline | Pending |
-| DATA-03 | Phase 2 — Data and Feature Pipeline | Pending |
-| DATA-04 | Phase 2 — Data and Feature Pipeline | Pending |
+| DATA-01 | Phase 2 — Data and Feature Pipeline | Complete |
+| DATA-02 | Phase 2 — Data and Feature Pipeline | Complete |
+| DATA-03 | Phase 2 — Data and Feature Pipeline | Complete |
+| DATA-04 | Phase 2 — Data and Feature Pipeline | Complete |
 | FEAT-01 | Phase 2 — Data and Feature Pipeline | Pending |
 | FEAT-02 | Phase 2 — Data and Feature Pipeline | Pending |
 | FEAT-03 | Phase 2 — Data and Feature Pipeline | Pending |

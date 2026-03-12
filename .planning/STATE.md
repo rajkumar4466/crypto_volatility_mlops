@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-12T22:33:58.667Z"
+last_updated: "2026-03-12T22:42:10Z"
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 11
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -18,32 +18,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 1 — Infrastructure Foundation
+**Current focus:** Phase 2 — Data and Feature Pipeline
 
 ## Current Position
 
-Phase: 1 of 7 (Infrastructure Foundation)
-Plan: 2 of 2 in current phase
-Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-03-12 — Plan 01-01 complete: Terraform IaC for all AWS resources (5 modules, lifecycle scripts)
+Phase: 2 of 7 (Data and Feature Pipeline)
+Plan: 1 of 2 in current phase
+Status: In progress — Plan 02-01 complete, Plan 02-02 next
+Last activity: 2026-03-12 — Plan 02-01 complete: CoinGecko ingest + 12 features + VOLATILE/CALM labels with TDD look-ahead bias guards
 
-Progress: [██░░░░░░░░] 14%
+Progress: [███░░░░░░░] 21%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: ~3 min
-- Total execution time: ~6 min
+- Total plans completed: 3
+- Average duration: ~4 min
+- Total execution time: ~12 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-infrastructure-foundation | 2 | ~6 min | ~3 min |
+| 02-data-and-feature-pipeline | 1 | ~6 min | ~6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (~1 min), 01-01 (~5 min)
+- Last 5 plans: 02-01 (~6 min), 01-02 (~1 min), 01-01 (~5 min)
 - Trend: N/A (small sample)
 
 *Updated after each plan completion*
@@ -69,6 +70,9 @@ Recent decisions affecting current work:
 - Phase 1 (01-01): Lambda architectures=x86_64 confirmed — ARM64 ONNX Runtime illegal instruction bug
 - Phase 1 (01-01): Billing alarm via provider alias aws.billing (us-east-1) — billing metrics only exist there
 - Phase 1 (01-01): SG chaining (reference SG IDs not CIDR) for Lambda→Redis access
+- Phase 2 (02-01): RSI uses np.where(loss==0, 100) not replace(0, nan) — monotonic price sequences produce zero loss; NaN RSI would corrupt Feast writes
+- Phase 2 (02-01): label_volatility slice is [i+1:i+31] not [i:i+30] — FEATURE_COLS in compute.py is single source of truth for downstream Feast/Lambda/drift imports
+- Phase 2 (02-01): SWING_THRESHOLD = 0.02 (2%) for VOLATILE/CALM label boundary on BTC 1-min data
 
 ### Pending Todos
 
@@ -84,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 01-01-PLAN.md (Terraform IaC for all AWS resources — Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md (CoinGecko ingest + features + labels — Phase 2 Plan 1 complete)
 Resume file: None
