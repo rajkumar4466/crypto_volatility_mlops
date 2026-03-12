@@ -46,11 +46,11 @@ Plans:
   2. All 12 engineered features and VOLATILE/CALM labels exist in the Feast offline store (S3 Parquet), computable from a single `feast apply` + ingest run
   3. `feast materialize` populates the Redis online store and a spot-check query returns feature values matching the offline store
   4. A unit test asserts that labels at time T use only data from T+1 through T+30 (no look-ahead bias) and training split is time-ordered
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: CoinGecko ingest + 12-feature engineering + VOLATILE/CALM labeling script
-- [ ] 02-02: Feast feature view definitions, offline S3 store population, and Redis materialization
+- [ ] 02-01-PLAN.md — CoinGecko ingest + 12-feature engineering + VOLATILE/CALM labeling (TDD: look-ahead bias tests)
+- [ ] 02-02-PLAN.md — Feast feature view definitions (single source of truth), offline S3 store population, Redis materialization
 
 ### Phase 3: Model Training and Registry
 **Goal**: XGBoost trains on Feast offline features, exports to ONNX, logs to W&B, and only promotes to S3 registry if metrics improve over the current champion
