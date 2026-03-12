@@ -1,0 +1,9 @@
+project: crypto_volatility
+registry: s3://${FEAST_S3_BUCKET}/feast/registry.pb
+provider: aws
+online_store:
+  type: redis
+  connection_string: "${REDIS_HOST}:${REDIS_PORT}"
+offline_store:
+  type: file
+entity_key_serialization_version: 2
