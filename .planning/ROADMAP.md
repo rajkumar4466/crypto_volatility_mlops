@@ -61,11 +61,11 @@ Plans:
   2. An ONNX model file is written to S3 only after passing a smoke test: load the exported model, run inference on a known input, assert output shape matches expected
   3. When a new model's F1 exceeds the current `current_metrics.json` champion, `current.onnx` is replaced and the promotion decision is logged; when it does not, the challenger is archived and `current.onnx` is unchanged
   4. An S3 JSON backup of run metrics exists at `runs/{run_id}/metrics.json` and `params.json`
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: XGBoost GridSearchCV training + ONNX export + post-export validation
-- [ ] 03-02: W&B experiment tracking + S3 model registry + automated promotion gate
+- [ ] 03-01-PLAN.md — XGBoost GridSearchCV training + ONNX export + post-export smoke test (TRAIN-01, TRAIN-02, TRAIN-03)
+- [ ] 03-02-PLAN.md — W&B experiment tracking + S3 metrics backup + S3 model registry + automated promotion gate (TRAIN-04, TRAIN-05, REG-01, REG-02, REG-03)
 
 ### Phase 4: Lambda Serving and API
 **Goal**: A live API endpoint returns BTC volatility predictions by reading features from Redis and running ONNX inference, with predictions logged for accuracy tracking
