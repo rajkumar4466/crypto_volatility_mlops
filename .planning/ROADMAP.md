@@ -31,11 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. A CloudWatch billing alarm fires (or is verifiably configured to fire) at the $1 threshold before any resource incurs cost
   3. `terraform destroy` removes all resources and a CLI audit confirms no orphaned resources remain
   4. `docker-compose up` brings up all components locally for development and testing
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Terraform modules for all AWS resources + billing alarm + destroy script
-- [ ] 01-02: docker-compose for local development environment
+- [ ] 01-01-PLAN.md -- Terraform modules (billing, network, storage, compute, serverless) + lifecycle scripts
+- [ ] 01-02-PLAN.md -- docker-compose for local development environment
 
 ### Phase 2: Data and Feature Pipeline
 **Goal**: BTC OHLCV data flows from CoinGecko through 12-feature engineering into Feast offline (S3) and online (Redis) stores with no look-ahead bias
