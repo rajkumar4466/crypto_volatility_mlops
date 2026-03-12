@@ -7,11 +7,11 @@
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: All AWS resources provisioned via Terraform (ECR, EC2, RDS, ElastiCache, Lambda, API Gateway, S3, DynamoDB, SNS, CloudWatch)
-- [ ] **INFRA-02**: EC2 user-data script configures 2-4GB swap before Airflow starts
-- [ ] **INFRA-03**: CloudWatch billing alarm triggers at $1 threshold before any resource creation
+- [x] **INFRA-01**: All AWS resources provisioned via Terraform (ECR, EC2, RDS, ElastiCache, Lambda, API Gateway, S3, DynamoDB, SNS, CloudWatch)
+- [x] **INFRA-02**: EC2 user-data script configures 2-4GB swap before Airflow starts
+- [x] **INFRA-03**: CloudWatch billing alarm triggers at $1 threshold before any resource creation
 - [x] **INFRA-04**: docker-compose.yml for local development and testing of all components
-- [ ] **INFRA-05**: Destroy script (terraform destroy + cleanup of manually-created resources like snapshots, Elastic IPs)
+- [x] **INFRA-05**: Destroy script (terraform destroy + cleanup of manually-created resources like snapshots, Elastic IPs)
 
 ### Data Pipeline
 
@@ -104,11 +104,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 1 — Infrastructure Foundation | Pending |
-| INFRA-02 | Phase 1 — Infrastructure Foundation | Pending |
-| INFRA-03 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-01 | Phase 1 — Infrastructure Foundation | Complete |
+| INFRA-02 | Phase 1 — Infrastructure Foundation | Complete |
+| INFRA-03 | Phase 1 — Infrastructure Foundation | Complete |
 | INFRA-04 | Phase 1 — Infrastructure Foundation | Complete |
-| INFRA-05 | Phase 1 — Infrastructure Foundation | Pending |
+| INFRA-05 | Phase 1 — Infrastructure Foundation | Complete |
 | DATA-01 | Phase 2 — Data and Feature Pipeline | Pending |
 | DATA-02 | Phase 2 — Data and Feature Pipeline | Pending |
 | DATA-03 | Phase 2 — Data and Feature Pipeline | Pending |

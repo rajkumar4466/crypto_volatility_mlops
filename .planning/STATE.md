@@ -11,27 +11,27 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 
 Phase: 1 of 7 (Infrastructure Foundation)
 Plan: 2 of 2 in current phase
-Status: In progress
-Last activity: 2026-03-12 — Plan 01-02 complete: docker-compose.yml for local dev environment
+Status: Phase 1 complete — ready for Phase 2
+Last activity: 2026-03-12 — Plan 01-01 complete: Terraform IaC for all AWS resources (5 modules, lifecycle scripts)
 
-Progress: [█░░░░░░░░░] 7%
+Progress: [██░░░░░░░░] 14%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: ~1 min
-- Total execution time: ~1 min
+- Total plans completed: 2
+- Average duration: ~3 min
+- Total execution time: ~6 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-infrastructure-foundation | 1 | ~1 min | ~1 min |
+| 01-infrastructure-foundation | 2 | ~6 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (1 min)
-- Trend: N/A (first plan)
+- Last 5 plans: 01-02 (~1 min), 01-01 (~5 min)
+- Trend: N/A (small sample)
 
 *Updated after each plan completion*
 
@@ -50,6 +50,12 @@ Recent decisions affecting current work:
 - Phase 1 (01-02): SequentialExecutor for Airflow (not CeleryExecutor) — matches t3.micro RAM constraint; no workers or broker config needed
 - Phase 1 (01-02): Profile-gated airflow-init (profiles=[init]) prevents accidental DB re-migration on every docker compose up
 - Phase 1 (01-02): postgres:16 and redis:7-alpine chosen to match Terraform RDS engine_version=16 and ElastiCache engine_version=7.1
+- Phase 1 (01-01): DynamoDB PROVISIONED billing mode (5 RCU/5 WCU) — PAY_PER_REQUEST disqualifies always-free 25 WCU/RCU tier
+- Phase 1 (01-01): ElastiCache aws_elasticache_cluster (cache.t3.micro) NOT Serverless — Serverless has no free tier
+- Phase 1 (01-01): API Gateway HTTP API v2 (aws_apigatewayv2_api) not REST API v1 — 70% cheaper, simpler for GET endpoints
+- Phase 1 (01-01): Lambda architectures=x86_64 confirmed — ARM64 ONNX Runtime illegal instruction bug
+- Phase 1 (01-01): Billing alarm via provider alias aws.billing (us-east-1) — billing metrics only exist there
+- Phase 1 (01-01): SG chaining (reference SG IDs not CIDR) for Lambda→Redis access
 
 ### Pending Todos
 
@@ -65,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed 01-02-PLAN.md (docker-compose.yml for local dev environment)
+Stopped at: Completed 01-01-PLAN.md (Terraform IaC for all AWS resources — Phase 1 complete)
 Resume file: None
