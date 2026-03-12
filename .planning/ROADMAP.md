@@ -76,10 +76,10 @@ Plans:
   2. `GET /predict` returns a JSON response with prediction (VOLATILE or CALM), probability, and model_version — sourced from Feast Redis, not inline feature computation
   3. Each prediction is logged to DynamoDB with timestamp, features, prediction, probability, and model_version
   4. 30 minutes after a prediction, the actual label is backfilled into DynamoDB for accuracy tracking
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 04-01: FastAPI + ONNX Runtime Lambda container + API Gateway + Feast Redis integration + DynamoDB prediction logging + backfill job
+- [ ] 04-01-PLAN.md — FastAPI + ONNX Runtime Lambda container (x86_64) + Feast Redis feature retrieval + DynamoDB prediction logging + backfill Lambda + EventBridge Scheduler
 
 ### Phase 5: Airflow DAG Orchestration
 **Goal**: A single Airflow DAG runs every 30 minutes, executing the verified ingest → features → predict → retrain → evaluate → promote → monitor sequence with retries and failure handling
