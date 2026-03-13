@@ -1,0 +1,11 @@
+FROM public.ecr.aws/lambda/python:3.11
+
+# Backfill Lambda only needs boto3 (bundled) and requests
+COPY backfill/requirements.txt ${LAMBDA_TASK_ROOT}
+RUN pip install -r requirements.txt --no-cache-dir
+
+# Copy backfill handler
+COPY backfill/ ${LAMBDA_TASK_ROOT}/backfill/
+
+# Backfill handler entrypoint
+CMD ["backfill.backfill_lambda.handler"]
