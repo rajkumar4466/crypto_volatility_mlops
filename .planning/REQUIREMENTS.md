@@ -51,11 +51,11 @@
 
 ### Orchestration
 
-- [ ] **ORCH-01**: Apache Airflow on EC2 t3.micro with RDS db.t3.micro PostgreSQL metadata store
-- [ ] **ORCH-02**: DAG with 7 tasks: ingest → compute_features → predict → retrain → evaluate → promote → monitor
-- [ ] **ORCH-03**: Task dependencies enforced: retrain skips if ingest fails, promote skips if evaluate fails
-- [ ] **ORCH-04**: DAG scheduled every 30 minutes
-- [ ] **ORCH-05**: Airflow webserver accessible on port 8080 for UI monitoring
+- [x] **ORCH-01**: Apache Airflow on EC2 t3.micro with RDS db.t3.micro PostgreSQL metadata store
+- [x] **ORCH-02**: DAG with 7 tasks: ingest → compute_features → predict → retrain → evaluate → promote → monitor
+- [x] **ORCH-03**: Task dependencies enforced: retrain skips if ingest fails, promote skips if evaluate fails
+- [x] **ORCH-04**: DAG scheduled every 30 minutes
+- [x] **ORCH-05**: Airflow webserver accessible on port 8080 for UI monitoring
 
 ### Monitoring
 
@@ -130,11 +130,11 @@
 | SERV-03 | Phase 4 — Lambda Serving and API | Complete |
 | SERV-04 | Phase 4 — Lambda Serving and API | Complete |
 | SERV-05 | Phase 4 — Lambda Serving and API | Complete |
-| ORCH-01 | Phase 5 — Airflow DAG Orchestration | Pending |
-| ORCH-02 | Phase 5 — Airflow DAG Orchestration | Pending |
-| ORCH-03 | Phase 5 — Airflow DAG Orchestration | Pending |
-| ORCH-04 | Phase 5 — Airflow DAG Orchestration | Pending |
-| ORCH-05 | Phase 5 — Airflow DAG Orchestration | Pending |
+| ORCH-01 | Phase 5 — Airflow DAG Orchestration | Complete |
+| ORCH-02 | Phase 5 — Airflow DAG Orchestration | Complete |
+| ORCH-03 | Phase 5 — Airflow DAG Orchestration | Complete |
+| ORCH-04 | Phase 5 — Airflow DAG Orchestration | Complete |
+| ORCH-05 | Phase 5 — Airflow DAG Orchestration | Complete |
 | MON-01 | Phase 6 — Monitoring and Drift Detection | Pending |
 | MON-02 | Phase 6 — Monitoring and Drift Detection | Pending |
 | MON-03 | Phase 6 — Monitoring and Drift Detection | Pending |

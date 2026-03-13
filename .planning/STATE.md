@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T15:41:31.037Z"
+last_updated: "2026-03-13T17:29:34.034Z"
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 4 — Lambda Serving (Plan 01 complete, no more plans in this phase)
+**Current focus:** Phase 5 — Airflow DAG Orchestration (Plan 01 complete, checkpoint awaiting human verification)
 
 ## Current Position
 
-Phase: 4 of 7 (Lambda Serving and API) — COMPLETE
-Plan: 1 of 1 in phase — Plan 04-01 COMPLETE
-Status: Phase 4 complete — moving to Phase 5 (Drift Detection and Retraining)
-Last activity: 2026-03-13 — Plan 04-01 complete: serving/ directory with FastAPI+ONNX+Feast Lambda, backfill Lambda, Terraform EventBridge Scheduler
+Phase: 5 of 7 (Airflow DAG Orchestration) — Plan 01 automated tasks complete
+Plan: 1 of 1 in phase — Plan 05-01 automated tasks COMPLETE (Task 3: human-verify checkpoint pending)
+Status: Phase 5 automated work done — awaiting human verification of deployed Airflow instance
+Last activity: 2026-03-13 — Plan 05-01: airflow_setup.sh, crypto_volatility_dag.py (7-task DAG with trigger_rule skip enforcement), systemd service files
 
-Progress: [███████░░░] 64%
+Progress: [████████░░] 73%
 
 ## Performance Metrics
 
@@ -44,9 +44,10 @@ Progress: [███████░░░] 64%
 | 02-data-and-feature-pipeline | 2 | ~12 min | ~6 min |
 | 03-model-training-and-registry | 2 of 2 | ~71 min | ~35 min |
 | 04-lambda-serving-and-api | 1 of 1 | ~14 min | ~14 min |
+| 05-airflow-dag-orchestration | 1 of 1 | ~8 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (~14 min), 03-02 (~15 min), 03-01 (~56 min), 02-02 (~6 min), 02-01 (~6 min)
+- Last 5 plans: 05-01 (~8 min), 04-01 (~14 min), 03-02 (~15 min), 03-01 (~56 min), 02-02 (~6 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -87,6 +88,10 @@ Recent decisions affecting current work:
 - [Phase 04-lambda-serving-and-api]: feature_store.yaml rendered at Lambda INIT to /tmp — REDIS_HOST and S3_BUCKET injected as env vars
 - [Phase 04-lambda-serving-and-api]: Separate Dockerfile.backfill for lighter backfill Lambda image (requests only, no onnxruntime/feast)
 - [Phase 04-lambda-serving-and-api]: CoinGecko free tier is day-granular — backfill uses daily price proxy; Phase 5 refines with OHLCV
+- [Phase 05-airflow-dag-orchestration]: Airflow 2.10.4 with pip constraint file prevents dependency conflicts on shared EC2 instance
+- [Phase 05-airflow-dag-orchestration]: TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS on retrain and promote — skipped upstream yields orange skip, not red failure
+- [Phase 05-airflow-dag-orchestration]: TriggerRule.ALL_DONE on monitor — always emits observability signals even when pipeline partially fails
+- [Phase 05-airflow-dag-orchestration]: max_active_runs=1 prevents concurrent DAG runs racing over Feast materialization and model registry state
 
 ### Pending Todos
 
@@ -102,5 +107,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 04-01-PLAN.md — serving/ directory, FastAPI+ONNX+Feast Lambda, backfill Lambda, Terraform EventBridge Scheduler
+Stopped at: Completed 05-01-PLAN.md automated tasks — airflow_setup.sh, crypto_volatility_dag.py, systemd service files. Task 3 checkpoint (human-verify) awaiting deployment on EC2+RDS.
 Resume file: None
