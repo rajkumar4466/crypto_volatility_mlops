@@ -78,9 +78,12 @@ resource "aws_lambda_function" "predictor" {
 
   environment {
     variables = {
-      REDIS_HOST = var.redis_endpoint
-      REDIS_PORT = "6379"
-      S3_BUCKET  = var.s3_bucket_name
+      REDIS_HOST        = var.redis_endpoint
+      REDIS_PORT        = "6379"
+      S3_BUCKET         = var.s3_bucket_name
+      PREDICTIONS_TABLE = var.dynamodb_table_name
+      MODEL_VERSION     = "0.0.0" # Updated by Phase 3 CI on promotion
+      FEAST_REPO_PATH   = "/var/task/feature_repo"
     }
   }
 
@@ -136,6 +139,75 @@ resource "aws_lambda_permission" "api_gw" {
   function_name = aws_lambda_function.predictor.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.main.execution_arn}/*/*"
+}
+
+# Backfill Lambda function — triggered by EventBridge Scheduler every 30 min
+resource "aws_lambda_function" "backfill" {
+  function_name = "${var.project_name}-backfill"
+  role          = aws_iam_role.lambda.arn
+
+  package_type  = "Image"
+  image_uri     = "${var.ecr_repository_url}:backfill-latest"
+  architectures = ["x86_64"]
+
+  memory_size = 256
+  timeout     = 120 # 2 minutes — scan + CoinGecko calls
+
+  environment {
+    variables = {
+      PREDICTIONS_TABLE = var.dynamodb_table_name
+    }
+  }
+
+  tags = {
+    Name    = "${var.project_name}-backfill"
+    Project = var.project_name
+  }
+}
+
+# IAM Role for EventBridge Scheduler to invoke Lambda
+resource "aws_iam_role" "scheduler" {
+  name = "${var.project_name}-scheduler-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "scheduler.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "scheduler_invoke" {
+  name = "${var.project_name}-scheduler-invoke"
+  role = aws_iam_role.scheduler.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "lambda:InvokeFunction"
+      Resource = aws_lambda_function.backfill.arn
+    }]
+  })
+}
+
+# EventBridge Scheduler — invoke backfill Lambda every 30 minutes
+resource "aws_scheduler_schedule" "backfill" {
+  name       = "${var.project_name}-backfill-schedule"
+  group_name = "default"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(30 minutes)"
+
+  target {
+    arn      = aws_lambda_function.backfill.arn
+    role_arn = aws_iam_role.scheduler.arn
+  }
 }
 
 # SNS topic for data drift alerts (separate from billing topic)

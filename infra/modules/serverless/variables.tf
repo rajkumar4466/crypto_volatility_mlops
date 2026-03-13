@@ -37,3 +37,8 @@ variable "dynamodb_table_arn" {
   type        = string
   description = "DynamoDB table ARN for IAM policy"
 }
+
+variable "dynamodb_table_name" {
+  type        = string
+  description = "DynamoDB table name for prediction logging (passed to Lambda env var)"
+}

@@ -17,3 +17,8 @@ output "sns_drift_topic_arn" {
   description = "SNS topic ARN for drift alerts"
   value       = aws_sns_topic.drift_alerts.arn
 }
+
+output "backfill_lambda_function_name" {
+  description = "Backfill Lambda function name"
+  value       = aws_lambda_function.backfill.function_name
+}

@@ -54,4 +54,5 @@ module "serverless" {
   s3_bucket_name      = module.storage.s3_bucket_name
   s3_bucket_arn       = module.storage.s3_bucket_arn
   dynamodb_table_arn  = module.storage.dynamodb_table_arn
+  dynamodb_table_name = module.storage.dynamodb_table_name
 }
