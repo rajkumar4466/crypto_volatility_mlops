@@ -56,3 +56,11 @@ module "serverless" {
   dynamodb_table_arn  = module.storage.dynamodb_table_arn
   dynamodb_table_name = module.storage.dynamodb_table_name
 }
+
+module "monitoring" {
+  source = "./modules/monitoring"
+
+  aws_region   = var.aws_region
+  project_name = var.project_name
+  alert_email  = var.alert_email
+}
