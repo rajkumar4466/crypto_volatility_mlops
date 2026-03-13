@@ -6,8 +6,9 @@ Usage:
 
 Environment variables:
     FEAST_REPO_PATH   Path to Feast repo directory (default: feast/)
-    S3_BUCKET         AWS S3 bucket name (used by Plan 03-02 S3 upload; read here for env parity)
-    WANDB_API_KEY     Consumed by W&B (added in Plan 03-02)
+    S3_BUCKET         AWS S3 bucket name — required for S3 metrics backup and registry
+    WANDB_API_KEY     Required by W&B; if WANDB_MODE=offline, runs without hitting the API
+    WANDB_MODE        Set to "offline" for CI/smoke tests (optional)
 
 Returns (via run_training()):
     (onnx_path: str, metrics: dict, best_params: dict)
@@ -16,6 +17,8 @@ Returns (via run_training()):
 import json
 import os
 import sys
+
+import wandb
 
 import numpy as np
 import pandas as pd
@@ -61,8 +64,9 @@ FEATURE_NAMES = [
 ]
 FEATURE_COLS = [f.split(":")[1] for f in FEATURE_NAMES]  # strip view prefix
 
+from training.registry import backup_run_artifacts, promote_or_archive
+
 FEAST_REPO_PATH = os.environ.get("FEAST_REPO_PATH", "feast/")
-S3_BUCKET = os.environ.get("S3_BUCKET", "")
 
 
 def _load_features_from_feast() -> pd.DataFrame:
@@ -147,16 +151,24 @@ def _load_features_from_feast() -> pd.DataFrame:
 
 
 def run_training() -> tuple:
-    """Execute full training pipeline: feature pull -> GridSearchCV -> ONNX export -> smoke test.
+    """Execute full training pipeline with W&B tracking, S3 backup, and registry promotion.
 
     Steps:
-        1. Pull features from Feast offline store (no inline recomputation)
-        2. Time-ordered train/test split (no shuffle — prevents look-ahead bias)
-        3. GridSearchCV with TimeSeriesSplit (n_jobs=1 to avoid OOM on t3.micro)
-        4. Evaluate on held-out test set
-        5. Export best_estimator_ (NOT GridSearchCV wrapper) to ONNX
-        6. Smoke test the exported ONNX (raises AssertionError on failure)
-        7. Print metrics as JSON to stdout
+        1.  wandb.init() — start experiment tracking run
+        2.  Pull features from Feast offline store (no inline recomputation)
+        3.  Time-ordered train/test split (no shuffle — prevents look-ahead bias)
+        4.  GridSearchCV with TimeSeriesSplit (n_jobs=1 to avoid OOM on t3.micro)
+        5.  Evaluate on held-out test set
+        6.  Export best_estimator_ (NOT GridSearchCV wrapper) to ONNX
+        7.  Smoke test the exported ONNX (raises AssertionError on failure)
+        8.  wandb.log(metrics + best_params)
+        9.  wandb.log(feature importance bar chart)
+        10. Upload ONNX artifact to W&B
+        11. backup_run_artifacts() — write metrics.json + params.json to S3
+        12. promote_or_archive() — champion/challenger gate in S3
+        13. wandb.log(promotion_decision)
+        14. wandb.finish() — always called in finally block
+        15. return (onnx_path, metrics, best_params)
 
     Returns:
         (onnx_path: str, metrics: dict, best_params: dict)
@@ -164,25 +176,14 @@ def run_training() -> tuple:
     Raises:
         AssertionError: If smoke test fails — prevents broken ONNX propagation.
         RuntimeError: If feature loading fails or feature count is unexpected.
+
+    Environment variables:
+        S3_BUCKET       — required; no default (fails loudly if missing)
+        WANDB_API_KEY   — required unless WANDB_MODE=offline
+        FEAST_REPO_PATH — path to Feast repo (default: feast/)
     """
     # ------------------------------------------------------------------
-    # 1. Load features from Feast offline store
-    # ------------------------------------------------------------------
-    df = _load_features_from_feast()
-
-    # ------------------------------------------------------------------
-    # 2. Time-ordered train/test split — NO shuffle (time series data)
-    # ------------------------------------------------------------------
-    cutoff = int(len(df) * 0.8)
-    X_train = df[FEATURE_COLS].iloc[:cutoff].astype(np.float32)
-    X_test = df[FEATURE_COLS].iloc[cutoff:].astype(np.float32)
-    y_train = df["label"].iloc[:cutoff].astype(int)
-    y_test = df["label"].iloc[cutoff:].astype(int)
-
-    # ------------------------------------------------------------------
-    # 3. GridSearchCV with TimeSeriesSplit
-    #    n_jobs=1 on both GridSearchCV and XGBClassifier: CRITICAL to avoid
-    #    OOM on t3.micro (1GB RAM). Do NOT change without profiling.
+    # 1. W&B init — must come first so run.id is available as correlation key
     # ------------------------------------------------------------------
     param_grid = {
         "max_depth": [3, 5, 7],
@@ -190,59 +191,157 @@ def run_training() -> tuple:
         "n_estimators": [50, 100, 200],
         "subsample": [0.8, 1.0],
     }
-    tscv = TimeSeriesSplit(n_splits=5)
-    clf = XGBClassifier(
-        use_label_encoder=False,
-        eval_metric="logloss",
-        n_jobs=1,        # CRITICAL: avoid OOM on t3.micro
-        random_state=42,
+    run = wandb.init(
+        project="crypto-volatility-mlops",
+        config={
+            "param_grid": param_grid,
+            "n_splits": 5,
+            "scoring": "f1",
+        },
+        tags=["training", "xgboost", "phase-3"],
     )
-    grid_search = GridSearchCV(
-        clf,
-        param_grid,
-        cv=tscv,
-        scoring="f1",
-        n_jobs=1,        # outer loop also single-threaded
-        verbose=1,
-    )
-    grid_search.fit(X_train, y_train)
+    try:
+        # ------------------------------------------------------------------
+        # 2. Load features from Feast offline store
+        # ------------------------------------------------------------------
+        df = _load_features_from_feast()
 
-    # ------------------------------------------------------------------
-    # 4. Evaluate on held-out test set
-    # ------------------------------------------------------------------
-    y_pred = grid_search.predict(X_test)
-    y_prob = grid_search.predict_proba(X_test)[:, 1]
-    metrics = {
-        "accuracy": float(accuracy_score(y_test, y_pred)),
-        "f1": float(f1_score(y_test, y_pred)),
-        "roc_auc": float(roc_auc_score(y_test, y_prob)),
-    }
+        # ------------------------------------------------------------------
+        # 3. Time-ordered train/test split — NO shuffle (time series data)
+        # ------------------------------------------------------------------
+        cutoff = int(len(df) * 0.8)
+        X_train = df[FEATURE_COLS].iloc[:cutoff].astype(np.float32)
+        X_test = df[FEATURE_COLS].iloc[cutoff:].astype(np.float32)
+        y_train = df["label"].iloc[:cutoff].astype(int)
+        y_test = df["label"].iloc[cutoff:].astype(int)
 
-    # ------------------------------------------------------------------
-    # 5. ONNX export — export best_estimator_, NOT grid_search wrapper
-    #    Exporting the wrapper silently produces a broken ONNX model.
-    # ------------------------------------------------------------------
-    n_features = X_train.shape[1]
-    assert n_features == 12, f"Expected 12 features, got {n_features}"
-    initial_type = [("X", FloatTensorType([None, n_features]))]
+        # ------------------------------------------------------------------
+        # 4. GridSearchCV with TimeSeriesSplit
+        #    n_jobs=1 on both GridSearchCV and XGBClassifier: CRITICAL to avoid
+        #    OOM on t3.micro (1GB RAM). Do NOT change without profiling.
+        # ------------------------------------------------------------------
+        tscv = TimeSeriesSplit(n_splits=5)
+        clf = XGBClassifier(
+            use_label_encoder=False,
+            eval_metric="logloss",
+            n_jobs=1,        # CRITICAL: avoid OOM on t3.micro
+            random_state=42,
+        )
+        grid_search = GridSearchCV(
+            clf,
+            param_grid,
+            cv=tscv,
+            scoring="f1",
+            n_jobs=1,        # outer loop also single-threaded
+            verbose=1,
+        )
+        grid_search.fit(X_train, y_train)
 
-    onnx_model = convert_sklearn(
-        grid_search.best_estimator_,   # NOT grid_search itself
-        initial_types=initial_type,
-        target_opset=15,
-    )
-    onnx_path = "/tmp/model.onnx"
-    save_onnx_model(onnx_model, onnx_path)
+        # ------------------------------------------------------------------
+        # 5. Evaluate on held-out test set
+        # ------------------------------------------------------------------
+        y_pred = grid_search.predict(X_test)
+        y_prob = grid_search.predict_proba(X_test)[:, 1]
+        metrics = {
+            "accuracy": float(accuracy_score(y_test, y_pred)),
+            "f1": float(f1_score(y_test, y_pred)),
+            "roc_auc": float(roc_auc_score(y_test, y_prob)),
+        }
 
-    # ------------------------------------------------------------------
-    # 6. Smoke test — must pass before returning artifact
-    #    Raises AssertionError if model is broken; script exits non-zero.
-    # ------------------------------------------------------------------
-    from training.smoke_test import smoke_test_onnx
+        # ------------------------------------------------------------------
+        # 6. ONNX export — export best_estimator_, NOT grid_search wrapper
+        #    Exporting the wrapper silently produces a broken ONNX model.
+        # ------------------------------------------------------------------
+        n_features = X_train.shape[1]
+        assert n_features == 12, f"Expected 12 features, got {n_features}"
+        initial_type = [("X", FloatTensorType([None, n_features]))]
 
-    smoke_test_onnx(onnx_path, n_features=12)
+        onnx_model = convert_sklearn(
+            grid_search.best_estimator_,   # NOT grid_search itself
+            initial_types=initial_type,
+            target_opset=15,
+        )
+        onnx_path = "/tmp/model.onnx"
+        save_onnx_model(onnx_model, onnx_path)
 
-    return onnx_path, metrics, grid_search.best_params_
+        # ------------------------------------------------------------------
+        # 7. Smoke test — must pass before any artifact upload
+        #    Raises AssertionError if model is broken; script exits non-zero.
+        # ------------------------------------------------------------------
+        from training.smoke_test import smoke_test_onnx
+
+        smoke_test_onnx(onnx_path, n_features=12)
+
+        # ------------------------------------------------------------------
+        # 8. W&B: log scalar metrics + best hyperparams
+        # ------------------------------------------------------------------
+        wandb.log({
+            "accuracy": metrics["accuracy"],
+            "f1": metrics["f1"],
+            "roc_auc": metrics["roc_auc"],
+            "best_params": grid_search.best_params_,
+        })
+
+        # ------------------------------------------------------------------
+        # 9. W&B: log feature importance bar chart
+        # ------------------------------------------------------------------
+        importances = grid_search.best_estimator_.feature_importances_.tolist()
+        feat_names = FEATURE_COLS   # 12 column names without view prefix
+
+        table = wandb.Table(
+            data=list(zip(feat_names, importances)),
+            columns=["feature", "importance"],
+        )
+        wandb.log({
+            "feature_importance": wandb.plot.bar(
+                table, "feature", "importance", title="Feature Importances"
+            )
+        })
+
+        # ------------------------------------------------------------------
+        # 10. W&B: upload ONNX artifact (only after smoke test passes)
+        # ------------------------------------------------------------------
+        artifact = wandb.Artifact(f"xgboost-onnx-{run.id}", type="model")
+        artifact.add_file(onnx_path)
+        run.log_artifact(artifact)
+
+        # ------------------------------------------------------------------
+        # 11. S3 metrics backup — one record per run regardless of promotion
+        # ------------------------------------------------------------------
+        bucket = os.environ["S3_BUCKET"]
+        backup_run_artifacts(bucket, run.id, metrics, grid_search.best_params_)
+
+        # ------------------------------------------------------------------
+        # 12. Promotion gate — replaces current.onnx only if F1 improves
+        # ------------------------------------------------------------------
+        decision, champion_f1 = promote_or_archive(
+            bucket=bucket,
+            run_id=run.id,
+            challenger_f1=metrics["f1"],
+            onnx_path=onnx_path,
+            challenger_metrics=metrics,
+        )
+        print(
+            f"Promotion decision: {decision} "
+            f"(challenger F1={metrics['f1']:.4f}, champion F1={champion_f1:.4f})"
+        )
+
+        # ------------------------------------------------------------------
+        # 13. W&B: log promotion decision
+        # ------------------------------------------------------------------
+        wandb.log({
+            "promotion_decision": decision,
+            "champion_f1_at_promotion": champion_f1,
+            "challenger_f1": metrics["f1"],
+        })
+
+        return onnx_path, metrics, grid_search.best_params_
+
+    finally:
+        # ------------------------------------------------------------------
+        # 14. Always finish the W&B run — even if an exception is raised
+        # ------------------------------------------------------------------
+        wandb.finish()
 
 
 if __name__ == "__main__":
