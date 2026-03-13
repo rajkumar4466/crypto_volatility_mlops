@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T18:39:02Z"
+last_updated: "2026-03-13T18:44:39.209Z"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -52,6 +52,7 @@ Progress: [█████████░] 82%
 - Trend: Stable
 
 *Updated after each plan completion*
+| Phase 06-monitoring-and-drift-detection P01 | 24 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,8 @@ Recent decisions affecting current work:
 - [Phase 06-02 monitoring-infra]: Separate SNS ml-alerts topic from serverless drift-alerts topic — CloudWatch threshold alarms vs Python-level drift notifications are different concerns
 - [Phase 06-02 monitoring-infra]: treat_missing_data=notBreaching on ALL CloudWatch alarms — prevents false alerts before Plan 06-01 metrics start flowing
 - [Phase 06-02 monitoring-infra]: alert_email variable reused from existing root variables.tf — no duplication; already declared for billing alerts
+- [Phase 06-monitoring-and-drift-detection]: Monitor task uses run_monitor() Python callable directly — avoids subprocess PATH issues for src.monitoring imports, enables cleaner testing
+- [Phase 06-monitoring-and-drift-detection]: FEATURE_NAMES exported from drift.py as module constant imported by DAG — single source of truth alongside FEATURE_COLS in src/features/compute.py
 
 ### Pending Todos
 
@@ -111,5 +114,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 06-02-PLAN.md — infra/modules/monitoring/ (SNS ml-alerts, accuracy_low alarm, drift_detected alarm, 5-widget dashboard), module wired into infra/main.tf. terraform validate + plan both pass.
+Stopped at: Completed 06-01-PLAN.md — src/monitoring/ package (drift.py, accuracy.py, alerts.py, retrain_trigger.py), monitor task wired into dags/crypto_volatility_dag.py as run_monitor() callable.
 Resume file: None
