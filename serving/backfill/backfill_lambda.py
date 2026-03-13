@@ -9,6 +9,7 @@ Note: CoinGecko /coins/bitcoin/history is day-granular on the free tier.
 """
 
 import boto3
+from boto3.dynamodb.conditions import Attr
 import os
 import requests
 from datetime import datetime, timedelta, timezone
@@ -67,14 +68,11 @@ def handler(event, context):
     # Scan for records in the backfill window without actual_label
     result = table.scan(
         FilterExpression=(
-            "attribute_not_exists(actual_label) AND #ts BETWEEN :start AND :end"
+            Attr("actual_label").not_exists()
+            & Attr("timestamp").between(cutoff_start, cutoff_end)
         ),
-        ExpressionAttributeNames={"#ts": "timestamp"},
-        ExpressionAttributeValues={
-            ":start": cutoff_start,
-            ":end": cutoff_end,
-        },
         ProjectionExpression="prediction_id, #ts",
+        ExpressionAttributeNames={"#ts": "timestamp"},
     )
 
     backfilled = 0
