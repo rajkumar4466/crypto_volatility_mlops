@@ -32,14 +32,14 @@
 - [x] **TRAIN-01**: XGBoost classifier with GridSearchCV (cross-validated hyperparameter tuning)
 - [x] **TRAIN-02**: Export trained model to ONNX via onnxmltools (export best_estimator_, not GridSearchCV wrapper)
 - [x] **TRAIN-03**: ONNX validation step: load exported model, run inference, assert output shape before writing to S3
-- [ ] **TRAIN-04**: W&B experiment tracking: log params, metrics (accuracy, F1, ROC-AUC), feature importance, model artifact
-- [ ] **TRAIN-05**: S3 JSON backup of run metrics (runs/{run_id}/metrics.json, params.json)
+- [x] **TRAIN-04**: W&B experiment tracking: log params, metrics (accuracy, F1, ROC-AUC), feature importance, model artifact
+- [x] **TRAIN-05**: S3 JSON backup of run metrics (runs/{run_id}/metrics.json, params.json)
 
 ### Model Registry
 
-- [ ] **REG-01**: S3 versioned model storage: models/current.onnx (production) + models/v{n}.onnx (archived)
-- [ ] **REG-02**: Promotion gate: new model replaces current.onnx only if F1 score exceeds current production model
-- [ ] **REG-03**: Promotion decision logged to W&B and S3 (promoted/rejected, old vs new metrics)
+- [x] **REG-01**: S3 versioned model storage: models/current.onnx (production) + models/v{n}.onnx (archived)
+- [x] **REG-02**: Promotion gate: new model replaces current.onnx only if F1 score exceeds current production model
+- [x] **REG-03**: Promotion decision logged to W&B and S3 (promoted/rejected, old vs new metrics)
 
 ### Serving
 
@@ -120,11 +120,11 @@
 | TRAIN-01 | Phase 3 — Model Training and Registry | Complete |
 | TRAIN-02 | Phase 3 — Model Training and Registry | Complete |
 | TRAIN-03 | Phase 3 — Model Training and Registry | Complete |
-| TRAIN-04 | Phase 3 — Model Training and Registry | Pending |
-| TRAIN-05 | Phase 3 — Model Training and Registry | Pending |
-| REG-01 | Phase 3 — Model Training and Registry | Pending |
-| REG-02 | Phase 3 — Model Training and Registry | Pending |
-| REG-03 | Phase 3 — Model Training and Registry | Pending |
+| TRAIN-04 | Phase 3 — Model Training and Registry | Complete |
+| TRAIN-05 | Phase 3 — Model Training and Registry | Complete |
+| REG-01 | Phase 3 — Model Training and Registry | Complete |
+| REG-02 | Phase 3 — Model Training and Registry | Complete |
+| REG-03 | Phase 3 — Model Training and Registry | Complete |
 | SERV-01 | Phase 4 — Lambda Serving and API | Pending |
 | SERV-02 | Phase 4 — Lambda Serving and API | Pending |
 | SERV-03 | Phase 4 — Lambda Serving and API | Pending |

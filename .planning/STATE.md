@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T02:01:07.410Z"
+last_updated: "2026-03-13T15:10:00Z"
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 3 — Model Training and Registry
+**Current focus:** Phase 4 — Lambda Serving
 
 ## Current Position
 
-Phase: 3 of 7 (Model Training and Registry)
-Plan: 1 of 2 in current phase — Plan 03-01 COMPLETE
-Status: In progress — Plan 03-01 complete; Plan 03-02 (W&B + S3 registry) next
-Last activity: 2026-03-13 — Plan 03-01 complete: training pipeline (Feast pull -> GridSearchCV -> ONNX export -> smoke test)
+Phase: 3 of 7 (Model Training and Registry) — COMPLETE
+Plan: 2 of 2 in phase — Plan 03-02 COMPLETE
+Status: Phase 3 complete — moving to Phase 4 (Lambda Serving)
+Last activity: 2026-03-13 — Plan 03-02 complete: W&B tracking + S3 model registry with champion/challenger promotion gate
 
-Progress: [█████░░░░░] 45%
+Progress: [██████░░░░] 55%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: ~15 min
-- Total execution time: ~74 min
+- Total execution time: ~89 min
 
 **By Phase:**
 
@@ -42,10 +42,10 @@ Progress: [█████░░░░░] 45%
 |-------|-------|-------|----------|
 | 01-infrastructure-foundation | 2 | ~6 min | ~3 min |
 | 02-data-and-feature-pipeline | 2 | ~12 min | ~6 min |
-| 03-model-training-and-registry | 1 of 2 | ~56 min | ~56 min |
+| 03-model-training-and-registry | 2 of 2 | ~71 min | ~35 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (~56 min), 02-02 (~6 min), 02-01 (~6 min), 01-02 (~1 min), 01-01 (~5 min)
+- Last 5 plans: 03-02 (~15 min), 03-01 (~56 min), 02-02 (~6 min), 02-01 (~6 min), 01-02 (~1 min)
 - Trend: N/A (small sample)
 
 *Updated after each plan completion*
@@ -79,6 +79,10 @@ Recent decisions affecting current work:
 - [Phase 03-model-training-and-registry]: update_registered_converter(XGBClassifier) at module level in train.py — prevents MissingConverter at ONNX conversion time
 - [Phase 03-model-training-and-registry]: Export grid_search.best_estimator_ (not GridSearchCV wrapper) to ONNX — wrapper is not convertible by onnxmltools
 - [Phase 03-model-training-and-registry]: Feature view name is btc_volatility_features (not btc_features) — join key is symbol matching feast/features.py entity definition
+- [Phase 03-02 registry]: wandb.run.id used as correlation key for all S3 artifact paths (runs/{run_id}/*) — single ID links W&B run to S3 metrics, params, promotion record, and ONNX archive
+- [Phase 03-02 registry]: champion_f1=0.0 default when current_metrics.json absent — NoSuchKey is expected on first run; any challenger with F1 > 0 promotes
+- [Phase 03-02 registry]: try/finally for wandb.finish() in run_training() — guarantees W&B run closes cleanly even if S3 upload or promotion raises
+- [Phase 03-02 registry]: S3_BUCKET read via os.environ["S3_BUCKET"] with no default — KeyError is intentional loud failure if env var missing
 
 ### Pending Todos
 
@@ -94,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 03-01-PLAN.md — training/train.py + smoke_test.py + requirements.txt committed
+Stopped at: Completed 03-02-PLAN.md — training/registry.py created, training/train.py augmented with W&B + S3 registry
 Resume file: None
