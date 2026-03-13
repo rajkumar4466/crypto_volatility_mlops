@@ -133,7 +133,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Infrastructure Foundation | 2/2 | Complete   | 2026-03-12 |
 | 2. Data and Feature Pipeline | 2/2 | Complete   | 2026-03-12 |
-| 3. Model Training and Registry | 0/2 | Not started | - |
+| 3. Model Training and Registry | 1/2 | In Progress|  |
 | 4. Lambda Serving and API | 0/1 | Not started | - |
 | 5. Airflow DAG Orchestration | 0/1 | Not started | - |
 | 6. Monitoring and Drift Detection | 0/2 | Not started | - |

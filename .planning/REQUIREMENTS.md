@@ -29,9 +29,9 @@
 
 ### Model Training
 
-- [ ] **TRAIN-01**: XGBoost classifier with GridSearchCV (cross-validated hyperparameter tuning)
-- [ ] **TRAIN-02**: Export trained model to ONNX via onnxmltools (export best_estimator_, not GridSearchCV wrapper)
-- [ ] **TRAIN-03**: ONNX validation step: load exported model, run inference, assert output shape before writing to S3
+- [x] **TRAIN-01**: XGBoost classifier with GridSearchCV (cross-validated hyperparameter tuning)
+- [x] **TRAIN-02**: Export trained model to ONNX via onnxmltools (export best_estimator_, not GridSearchCV wrapper)
+- [x] **TRAIN-03**: ONNX validation step: load exported model, run inference, assert output shape before writing to S3
 - [ ] **TRAIN-04**: W&B experiment tracking: log params, metrics (accuracy, F1, ROC-AUC), feature importance, model artifact
 - [ ] **TRAIN-05**: S3 JSON backup of run metrics (runs/{run_id}/metrics.json, params.json)
 
@@ -117,9 +117,9 @@
 | FEAT-02 | Phase 2 — Data and Feature Pipeline | Complete |
 | FEAT-03 | Phase 2 — Data and Feature Pipeline | Complete |
 | FEAT-04 | Phase 2 — Data and Feature Pipeline | Complete |
-| TRAIN-01 | Phase 3 — Model Training and Registry | Pending |
-| TRAIN-02 | Phase 3 — Model Training and Registry | Pending |
-| TRAIN-03 | Phase 3 — Model Training and Registry | Pending |
+| TRAIN-01 | Phase 3 — Model Training and Registry | Complete |
+| TRAIN-02 | Phase 3 — Model Training and Registry | Complete |
+| TRAIN-03 | Phase 3 — Model Training and Registry | Complete |
 | TRAIN-04 | Phase 3 — Model Training and Registry | Pending |
 | TRAIN-05 | Phase 3 — Model Training and Registry | Pending |
 | REG-01 | Phase 3 — Model Training and Registry | Pending |

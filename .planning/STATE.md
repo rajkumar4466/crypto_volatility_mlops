@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T00:02:03.070Z"
+last_updated: "2026-03-13T02:01:07.410Z"
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 11
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 2 — Data and Feature Pipeline
+**Current focus:** Phase 3 — Model Training and Registry
 
 ## Current Position
 
-Phase: 2 of 7 (Data and Feature Pipeline)
-Plan: 2 of 2 in current phase — Phase 2 COMPLETE (pending Task 3 human-verify checkpoint)
-Status: In progress — Plan 02-02 tasks 1-2 complete, Task 3 checkpoint awaiting human-verify
-Last activity: 2026-03-12 — Plan 02-02 complete: Feast feature store definitions + offline write + materialize functions
+Phase: 3 of 7 (Model Training and Registry)
+Plan: 1 of 2 in current phase — Plan 03-01 COMPLETE
+Status: In progress — Plan 03-01 complete; Plan 03-02 (W&B + S3 registry) next
+Last activity: 2026-03-13 — Plan 03-01 complete: training pipeline (Feast pull -> GridSearchCV -> ONNX export -> smoke test)
 
-Progress: [████░░░░░░] 28%
+Progress: [█████░░░░░] 45%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~4.5 min
-- Total execution time: ~18 min
+- Total plans completed: 5
+- Average duration: ~15 min
+- Total execution time: ~74 min
 
 **By Phase:**
 
@@ -42,9 +42,10 @@ Progress: [████░░░░░░] 28%
 |-------|-------|-------|----------|
 | 01-infrastructure-foundation | 2 | ~6 min | ~3 min |
 | 02-data-and-feature-pipeline | 2 | ~12 min | ~6 min |
+| 03-model-training-and-registry | 1 of 2 | ~56 min | ~56 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (~6 min), 02-01 (~6 min), 01-02 (~1 min), 01-01 (~5 min)
+- Last 5 plans: 03-01 (~56 min), 02-02 (~6 min), 02-01 (~6 min), 01-02 (~1 min), 01-01 (~5 min)
 - Trend: N/A (small sample)
 
 *Updated after each plan completion*
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - Phase 2 (02-01): SWING_THRESHOLD = 0.02 (2%) for VOLATILE/CALM label boundary on BTC 1-min data
 - [Phase 02-data-and-feature-pipeline]: feast/features.py loaded via importlib.util.spec_from_file_location to avoid feast/ dir shadowing installed feast SDK (no __init__.py in feast/ dir)
 - [Phase 02-data-and-feature-pipeline]: FeatureView TTL = 75min (2.5x 30-min cycle); feast/ dir is not a Python package -- CLI-scanned Feast repo dir only
+- [Phase 03-model-training-and-registry]: update_registered_converter(XGBClassifier) at module level in train.py — prevents MissingConverter at ONNX conversion time
+- [Phase 03-model-training-and-registry]: Export grid_search.best_estimator_ (not GridSearchCV wrapper) to ONNX — wrapper is not convertible by onnxmltools
+- [Phase 03-model-training-and-registry]: Feature view name is btc_volatility_features (not btc_features) — join key is symbol matching feast/features.py entity definition
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: Completed 02-02-PLAN.md tasks 1-2; paused at Task 3 human-verify checkpoint (feast integration local verification + live AWS deferred to Phase 1 infra)
+Last session: 2026-03-13
+Stopped at: Completed 03-01-PLAN.md — training/train.py + smoke_test.py + requirements.txt committed
 Resume file: None
