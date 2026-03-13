@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T18:15:27.687Z"
+last_updated: "2026-03-13T18:39:02Z"
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 11
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 5 — Airflow DAG Orchestration (Plan 01 complete, checkpoint awaiting human verification)
+**Current focus:** Phase 6 — Monitoring and Drift Detection (Plan 01 complete, Plan 02 complete)
 
 ## Current Position
 
-Phase: 5 of 7 (Airflow DAG Orchestration) — Plan 01 automated tasks complete
-Plan: 1 of 1 in phase — Plan 05-01 automated tasks COMPLETE (Task 3: human-verify checkpoint pending)
-Status: Phase 5 automated work done — awaiting human verification of deployed Airflow instance
-Last activity: 2026-03-13 — Plan 05-01: airflow_setup.sh, crypto_volatility_dag.py (7-task DAG with trigger_rule skip enforcement), systemd service files
+Phase: 6 of 7 (Monitoring and Drift Detection) — Plan 02 complete
+Plan: 2 of 2 in phase — Plan 06-02 COMPLETE (Terraform monitoring module with SNS alarms + CloudWatch dashboard)
+Status: Phase 6 complete — monitoring Terraform module and Python drift detection both done
+Last activity: 2026-03-13 — Plan 06-02: infra/modules/monitoring/ (SNS topic, 2 CloudWatch alarms, 5-widget dashboard), wired into infra/main.tf
 
-Progress: [████████░░] 73%
+Progress: [█████████░] 82%
 
 ## Performance Metrics
 
@@ -45,9 +45,10 @@ Progress: [████████░░] 73%
 | 03-model-training-and-registry | 2 of 2 | ~71 min | ~35 min |
 | 04-lambda-serving-and-api | 1 of 1 | ~14 min | ~14 min |
 | 05-airflow-dag-orchestration | 1 of 1 | ~8 min | ~8 min |
+| 06-monitoring-and-drift-detection | 2 of 2 | ~20 min | ~10 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (~8 min), 04-01 (~14 min), 03-02 (~15 min), 03-01 (~56 min), 02-02 (~6 min)
+- Last 5 plans: 06-02 (~20 min), 05-01 (~8 min), 04-01 (~14 min), 03-02 (~15 min), 03-01 (~56 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 05-airflow-dag-orchestration]: TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS on retrain and promote — skipped upstream yields orange skip, not red failure
 - [Phase 05-airflow-dag-orchestration]: TriggerRule.ALL_DONE on monitor — always emits observability signals even when pipeline partially fails
 - [Phase 05-airflow-dag-orchestration]: max_active_runs=1 prevents concurrent DAG runs racing over Feast materialization and model registry state
+- [Phase 06-02 monitoring-infra]: Separate SNS ml-alerts topic from serverless drift-alerts topic — CloudWatch threshold alarms vs Python-level drift notifications are different concerns
+- [Phase 06-02 monitoring-infra]: treat_missing_data=notBreaching on ALL CloudWatch alarms — prevents false alerts before Plan 06-01 metrics start flowing
+- [Phase 06-02 monitoring-infra]: alert_email variable reused from existing root variables.tf — no duplication; already declared for billing alerts
 
 ### Pending Todos
 
@@ -107,5 +111,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 05-01-PLAN.md automated tasks — airflow_setup.sh, crypto_volatility_dag.py, systemd service files. Task 3 checkpoint (human-verify) awaiting deployment on EC2+RDS.
+Stopped at: Completed 06-02-PLAN.md — infra/modules/monitoring/ (SNS ml-alerts, accuracy_low alarm, drift_detected alarm, 5-widget dashboard), module wired into infra/main.tf. terraform validate + plan both pass.
 Resume file: None

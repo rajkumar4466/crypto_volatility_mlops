@@ -62,8 +62,8 @@
 - [ ] **MON-01**: Data drift detection via scipy KS-test on feature distributions (training vs recent, p-value < 0.01)
 - [ ] **MON-02**: Model drift detection via rolling accuracy on backfilled actuals (alert if accuracy < 55%)
 - [ ] **MON-03**: CloudWatch custom metrics: rolling_accuracy, drift_score, model_version, prediction_latency, retrain_count
-- [ ] **MON-04**: CloudWatch dashboard showing all metrics over time
-- [ ] **MON-05**: SNS topic with email subscription for drift/accuracy/latency alerts
+- [x] **MON-04**: CloudWatch dashboard showing all metrics over time
+- [x] **MON-05**: SNS topic with email subscription for drift/accuracy/latency alerts
 - [ ] **MON-06**: Drift-triggered retraining: SNS → Airflow REST API to trigger retrain DAG
 
 ### CI/CD
@@ -138,8 +138,8 @@
 | MON-01 | Phase 6 — Monitoring and Drift Detection | Pending |
 | MON-02 | Phase 6 — Monitoring and Drift Detection | Pending |
 | MON-03 | Phase 6 — Monitoring and Drift Detection | Pending |
-| MON-04 | Phase 6 — Monitoring and Drift Detection | Pending |
-| MON-05 | Phase 6 — Monitoring and Drift Detection | Pending |
+| MON-04 | Phase 6 — Monitoring and Drift Detection | Complete |
+| MON-05 | Phase 6 — Monitoring and Drift Detection | Complete |
 | MON-06 | Phase 6 — Monitoring and Drift Detection | Pending |
 | CICD-01 | Phase 7 — CI/CD Pipeline | Pending |
 | CICD-02 | Phase 7 — CI/CD Pipeline | Pending |

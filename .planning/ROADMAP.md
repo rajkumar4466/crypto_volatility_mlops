@@ -136,5 +136,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Model Training and Registry | 2/2 | Complete   | 2026-03-13 |
 | 4. Lambda Serving and API | 1/1 | Complete   | 2026-03-13 |
 | 5. Airflow DAG Orchestration | 1/1 | Complete   | 2026-03-13 |
-| 6. Monitoring and Drift Detection | 0/2 | Not started | - |
+| 6. Monitoring and Drift Detection | 1/2 | In Progress|  |
 | 7. CI/CD Pipeline | 0/1 | Not started | - |
