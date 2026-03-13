@@ -1,0 +1,17 @@
+[Unit]
+Description=Airflow scheduler daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/opt/airflow/airflow.env
+User=airflow
+Group=airflow
+Type=simple
+ExecStart=/usr/local/bin/airflow scheduler
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
