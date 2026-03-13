@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T15:10:00Z"
+last_updated: "2026-03-13T15:34:44.247Z"
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 11
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 4 — Lambda Serving
+**Current focus:** Phase 4 — Lambda Serving (Plan 01 complete, no more plans in this phase)
 
 ## Current Position
 
-Phase: 3 of 7 (Model Training and Registry) — COMPLETE
-Plan: 2 of 2 in phase — Plan 03-02 COMPLETE
-Status: Phase 3 complete — moving to Phase 4 (Lambda Serving)
-Last activity: 2026-03-13 — Plan 03-02 complete: W&B tracking + S3 model registry with champion/challenger promotion gate
+Phase: 4 of 7 (Lambda Serving and API) — COMPLETE
+Plan: 1 of 1 in phase — Plan 04-01 COMPLETE
+Status: Phase 4 complete — moving to Phase 5 (Drift Detection and Retraining)
+Last activity: 2026-03-13 — Plan 04-01 complete: serving/ directory with FastAPI+ONNX+Feast Lambda, backfill Lambda, Terraform EventBridge Scheduler
 
-Progress: [██████░░░░] 55%
+Progress: [███████░░░] 64%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: ~15 min
-- Total execution time: ~89 min
+- Total execution time: ~103 min
 
 **By Phase:**
 
@@ -43,10 +43,11 @@ Progress: [██████░░░░] 55%
 | 01-infrastructure-foundation | 2 | ~6 min | ~3 min |
 | 02-data-and-feature-pipeline | 2 | ~12 min | ~6 min |
 | 03-model-training-and-registry | 2 of 2 | ~71 min | ~35 min |
+| 04-lambda-serving-and-api | 1 of 1 | ~14 min | ~14 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (~15 min), 03-01 (~56 min), 02-02 (~6 min), 02-01 (~6 min), 01-02 (~1 min)
-- Trend: N/A (small sample)
+- Last 5 plans: 04-01 (~14 min), 03-02 (~15 min), 03-01 (~56 min), 02-02 (~6 min), 02-01 (~6 min)
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 03-02 registry]: champion_f1=0.0 default when current_metrics.json absent — NoSuchKey is expected on first run; any challenger with F1 > 0 promotes
 - [Phase 03-02 registry]: try/finally for wandb.finish() in run_training() — guarantees W&B run closes cleanly even if S3 upload or promotion raises
 - [Phase 03-02 registry]: S3_BUCKET read via os.environ["S3_BUCKET"] with no default — KeyError is intentional loud failure if env var missing
+- [Phase 04-lambda-serving-and-api]: feature_store.yaml rendered at Lambda INIT to /tmp — REDIS_HOST and S3_BUCKET injected as env vars
+- [Phase 04-lambda-serving-and-api]: Separate Dockerfile.backfill for lighter backfill Lambda image (requests only, no onnxruntime/feast)
+- [Phase 04-lambda-serving-and-api]: CoinGecko free tier is day-granular — backfill uses daily price proxy; Phase 5 refines with OHLCV
 
 ### Pending Todos
 
@@ -98,5 +102,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 03-02-PLAN.md — training/registry.py created, training/train.py augmented with W&B + S3 registry
+Stopped at: Completed 04-01-PLAN.md — serving/ directory, FastAPI+ONNX+Feast Lambda, backfill Lambda, Terraform EventBridge Scheduler
 Resume file: None

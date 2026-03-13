@@ -43,11 +43,11 @@
 
 ### Serving
 
-- [ ] **SERV-01**: Lambda function with ONNX Runtime for inference (x86_64 architecture, not ARM64)
-- [ ] **SERV-02**: FastAPI handler: reads features from Redis (Feast online store), runs ONNX inference, returns prediction
-- [ ] **SERV-03**: API Gateway HTTP API: GET /predict (latest prediction), GET /health
-- [ ] **SERV-04**: Prediction logging to DynamoDB: timestamp, features, prediction, probability, model_version
-- [ ] **SERV-05**: Backfill actual labels 30 minutes after prediction for accuracy tracking
+- [x] **SERV-01**: Lambda function with ONNX Runtime for inference (x86_64 architecture, not ARM64)
+- [x] **SERV-02**: FastAPI handler: reads features from Redis (Feast online store), runs ONNX inference, returns prediction
+- [x] **SERV-03**: API Gateway HTTP API: GET /predict (latest prediction), GET /health
+- [x] **SERV-04**: Prediction logging to DynamoDB: timestamp, features, prediction, probability, model_version
+- [x] **SERV-05**: Backfill actual labels 30 minutes after prediction for accuracy tracking
 
 ### Orchestration
 
@@ -125,11 +125,11 @@
 | REG-01 | Phase 3 — Model Training and Registry | Complete |
 | REG-02 | Phase 3 — Model Training and Registry | Complete |
 | REG-03 | Phase 3 — Model Training and Registry | Complete |
-| SERV-01 | Phase 4 — Lambda Serving and API | Pending |
-| SERV-02 | Phase 4 — Lambda Serving and API | Pending |
-| SERV-03 | Phase 4 — Lambda Serving and API | Pending |
-| SERV-04 | Phase 4 — Lambda Serving and API | Pending |
-| SERV-05 | Phase 4 — Lambda Serving and API | Pending |
+| SERV-01 | Phase 4 — Lambda Serving and API | Complete |
+| SERV-02 | Phase 4 — Lambda Serving and API | Complete |
+| SERV-03 | Phase 4 — Lambda Serving and API | Complete |
+| SERV-04 | Phase 4 — Lambda Serving and API | Complete |
+| SERV-05 | Phase 4 — Lambda Serving and API | Complete |
 | ORCH-01 | Phase 5 — Airflow DAG Orchestration | Pending |
 | ORCH-02 | Phase 5 — Airflow DAG Orchestration | Pending |
 | ORCH-03 | Phase 5 — Airflow DAG Orchestration | Pending |
