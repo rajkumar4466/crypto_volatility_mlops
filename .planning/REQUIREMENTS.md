@@ -68,9 +68,9 @@
 
 ### CI/CD
 
-- [ ] **CICD-01**: GitHub Actions CI: lint (ruff) + pytest + smoke train on PR
-- [ ] **CICD-02**: GitHub Actions CD: Docker build → push to ECR (with provenance: false) → terraform apply on merge
-- [ ] **CICD-03**: Post-deploy smoke test: hit GET /health and GET /predict endpoints
+- [x] **CICD-01**: GitHub Actions CI: lint (ruff) + pytest + smoke train on PR
+- [x] **CICD-02**: GitHub Actions CD: Docker build → push to ECR (with provenance: false) → terraform apply on merge
+- [x] **CICD-03**: Post-deploy smoke test: hit GET /health and GET /predict endpoints
 
 ## v2 Requirements
 
@@ -141,9 +141,9 @@
 | MON-04 | Phase 6 — Monitoring and Drift Detection | Complete |
 | MON-05 | Phase 6 — Monitoring and Drift Detection | Complete |
 | MON-06 | Phase 6 — Monitoring and Drift Detection | Complete |
-| CICD-01 | Phase 7 — CI/CD Pipeline | Pending |
-| CICD-02 | Phase 7 — CI/CD Pipeline | Pending |
-| CICD-03 | Phase 7 — CI/CD Pipeline | Pending |
+| CICD-01 | Phase 7 — CI/CD Pipeline | Complete |
+| CICD-02 | Phase 7 — CI/CD Pipeline | Complete |
+| CICD-03 | Phase 7 — CI/CD Pipeline | Complete |
 
 **Coverage:**
 - v1 requirements: 39 total

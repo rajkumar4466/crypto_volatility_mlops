@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-13T18:49:47.742Z"
+last_updated: "2026-03-13T19:12:55.664Z"
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** A working, observable MLOps loop where data drift triggers automated retraining, model evaluation, and promotion — all visible through dashboards and alerts within hours.
-**Current focus:** Phase 6 — Monitoring and Drift Detection (Plan 01 complete, Plan 02 complete)
+**Current focus:** Phase 7 — CI/CD Pipeline (Plan 01 at checkpoint: awaiting GitHub secrets + branch protection)
 
 ## Current Position
 
-Phase: 6 of 7 (Monitoring and Drift Detection) — Plan 02 complete
-Plan: 2 of 2 in phase — Plan 06-02 COMPLETE (Terraform monitoring module with SNS alarms + CloudWatch dashboard)
-Status: Phase 6 complete — monitoring Terraform module and Python drift detection both done
-Last activity: 2026-03-13 — Plan 06-02: infra/modules/monitoring/ (SNS topic, 2 CloudWatch alarms, 5-widget dashboard), wired into infra/main.tf
+Phase: 7 of 7 (CI/CD Pipeline) — Plan 01 at checkpoint
+Plan: 1 of 1 in phase — Plan 07-01 tasks 1+2 complete; Task 3 checkpoint:human-verify awaiting user action
+Status: Phase 7 in progress — CI/CD workflow files committed, awaiting GitHub secrets and branch protection configuration
+Last activity: 2026-03-13 — Plan 07-01: .github/workflows/ci.yml (ruff+pytest on PRs), .github/workflows/cd.yml (ECR+Terraform+smoke on merge), requirements-dev.txt
 
-Progress: [█████████░] 82%
+Progress: [██████████] 91%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 82%
 
 *Updated after each plan completion*
 | Phase 06-monitoring-and-drift-detection P01 | 24 | 3 tasks | 6 files |
+| Phase 07-cicd-pipeline P01 | 6 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,7 @@ Recent decisions affecting current work:
 - [Phase 06-02 monitoring-infra]: alert_email variable reused from existing root variables.tf — no duplication; already declared for billing alerts
 - [Phase 06-monitoring-and-drift-detection]: Monitor task uses run_monitor() Python callable directly — avoids subprocess PATH issues for src.monitoring imports, enables cleaner testing
 - [Phase 06-monitoring-and-drift-detection]: FEATURE_NAMES exported from drift.py as module constant imported by DAG — single source of truth alongside FEATURE_COLS in src/features/compute.py
+- [Phase 07-cicd-pipeline]: provenance:false+sbom:false on build-push-action@v5 for Lambda ECR compat; image_tag=SHA forces Terraform state change per deploy; terraform_wrapper:false for clean output parsing; aws lambda wait prevents smoke test race; job named lint-and-test matches branch protection check name
 
 ### Pending Todos
 
@@ -114,5 +116,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed 06-01-PLAN.md — src/monitoring/ package (drift.py, accuracy.py, alerts.py, retrain_trigger.py), monitor task wired into dags/crypto_volatility_dag.py as run_monitor() callable.
+Stopped at: Checkpoint in 07-01-PLAN.md — Task 3 (human-verify): configure GitHub secrets (AWS_ROLE_ARN, AWS_REGION, ECR_REPOSITORY) and branch protection requiring lint-and-test status check on main.
 Resume file: None
