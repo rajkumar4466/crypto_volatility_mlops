@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "billing_1_dollar" {
   provider = aws.billing
 
   alarm_name          = "${var.project_name}-billing-1-usd"
-  alarm_description   = "AWS estimated charges exceeded $1 — crypto-vol project"
+  alarm_description   = "AWS estimated charges exceeded $1 - crypto-vol project"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "EstimatedCharges"

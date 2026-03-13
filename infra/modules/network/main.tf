@@ -100,7 +100,7 @@ resource "aws_route_table_association" "public_b" {
 # Security Group: Airflow EC2 (dev-open — SSH + Airflow UI)
 resource "aws_security_group" "airflow" {
   name        = "${var.project_name}-airflow-sg"
-  description = "Airflow EC2 security group — SSH and Airflow UI (dev only)"
+  description = "Airflow EC2 security group - SSH and Airflow UI (dev only)"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -135,7 +135,7 @@ resource "aws_security_group" "airflow" {
 # Security Group: RDS PostgreSQL (inbound from airflow_sg only)
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-rds-sg"
-  description = "RDS PostgreSQL — inbound from Airflow EC2 only"
+  description = "RDS PostgreSQL - inbound from Airflow EC2 only"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -183,7 +183,7 @@ resource "aws_security_group" "lambda" {
 # Security Group: ElastiCache Redis (inbound from lambda_sg and airflow_sg)
 resource "aws_security_group" "redis" {
   name        = "${var.project_name}-redis-sg"
-  description = "ElastiCache Redis — inbound from Lambda and Airflow only"
+  description = "ElastiCache Redis - inbound from Lambda and Airflow only"
   vpc_id      = aws_vpc.main.id
 
   ingress {
