@@ -12,29 +12,39 @@ import boto3
 import io
 import pandas as pd
 
-COINGECKO_OHLCV_URL = "https://api.coingecko.com/api/v3/coins/bitcoin/ohlcv"
+COINGECKO_OHLC_URL = "https://api.coingecko.com/api/v3/coins/bitcoin/ohlc"
 HEADERS = {"User-Agent": "crypto-volatility-mlops/1.0"}
 
 
-def fetch_ohlcv(days: float = 0.1) -> list:
-    """Fetch BTC 1-min OHLCV candles from CoinGecko (no API key required).
+def fetch_ohlcv(days: int = 1) -> list:
+    """Fetch BTC OHLC candles from CoinGecko free API (no key required).
 
-    days=0.1 is approximately 144 minutes of 1-min candles on the free tier.
+    Free tier /ohlc endpoint returns:
+      days=1:   candles every 30 min (~48 rows)
+      days=7:   candles every 4 hours (~42 rows)
+      days=30:  candles every 4 hours (~180 rows)
+      days=90+: candles every 4 days
 
-    Raises ValueError on any null field — do not propagate NaN into features.
+    Note: Free tier has no volume data — volume column is set to 0.
+    Valid days: 1, 7, 14, 30, 90, 180, 365, max.
+
+    Raises ValueError on any null field.
     Rate limit: 30 req/min. One call per DAG run is safe.
 
     Returns:
         list of lists: [[ts_ms, open, high, low, close, volume], ...]
     """
     resp = requests.get(
-        COINGECKO_OHLCV_URL,
+        COINGECKO_OHLC_URL,
         params={"vs_currency": "usd", "days": days},
         headers=HEADERS,
         timeout=30,
     )
     resp.raise_for_status()
-    candles = resp.json()  # [[ts_ms, open, high, low, close, volume], ...]
+    # /ohlc returns [[ts_ms, open, high, low, close], ...] — no volume
+    raw_candles = resp.json()
+    # Add volume=0 placeholder to match expected 6-column format
+    candles = [row + [0.0] if len(row) == 5 else row for row in raw_candles]
 
     # Guard against null fields — raise rather than propagate NaN downstream
     for i, row in enumerate(candles):
