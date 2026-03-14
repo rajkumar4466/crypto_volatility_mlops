@@ -36,7 +36,7 @@ def fetch_ohlcv(days: int = 1) -> list:
     """
     resp = requests.get(
         COINGECKO_OHLC_URL,
-        params={"vs_currency": "usd", "days": days},
+        params={"vs_currency": "usd", "days": int(days)},
         headers=HEADERS,
         timeout=30,
     )
