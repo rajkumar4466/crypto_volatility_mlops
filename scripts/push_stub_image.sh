@@ -38,4 +38,9 @@ echo "Tagging and pushing to ${ECR_URL}:latest"
 docker tag "${STUB_IMAGE}" "${ECR_URL}:latest"
 docker push "${ECR_URL}:latest"
 
-echo "=== Stub image pushed successfully to ${ECR_URL}:latest ==="
+# Also push the same stub as :backfill-latest (backfill Lambda needs an image too)
+echo "Tagging and pushing to ${ECR_URL}:backfill-latest"
+docker tag "${STUB_IMAGE}" "${ECR_URL}:backfill-latest"
+docker push "${ECR_URL}:backfill-latest"
+
+echo "=== Stub images pushed successfully (latest + backfill-latest) ==="
