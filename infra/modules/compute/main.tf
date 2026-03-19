@@ -17,13 +17,74 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
+# IAM Role for Airflow EC2 — S3, DynamoDB, CloudWatch, Lambda access
+resource "aws_iam_role" "airflow_ec2" {
+  name = "${var.project_name}-airflow-ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
+
+  tags = {
+    Name    = "${var.project_name}-airflow-ec2-role"
+    Project = var.project_name
+  }
+}
+
+resource "aws_iam_role_policy" "airflow_ec2_access" {
+  name = "${var.project_name}-airflow-ec2-access"
+  role = aws_iam_role.airflow_ec2.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+        Resource = ["arn:aws:s3:::${var.s3_bucket_name}", "arn:aws:s3:::${var.s3_bucket_name}/*"]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["dynamodb:Scan", "dynamodb:Query", "dynamodb:GetItem", "dynamodb:PutItem"]
+        Resource = "arn:aws:dynamodb:*:*:table/${var.dynamodb_table_name}"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData", "cloudwatch:GetMetricStatistics", "cloudwatch:ListMetrics"]
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["lambda:InvokeFunction", "lambda:UpdateFunctionCode"]
+        Resource = "arn:aws:lambda:*:*:function:${var.project_name}-*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken", "ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_instance_profile" "airflow_ec2" {
+  name = "${var.project_name}-airflow-ec2-profile"
+  role = aws_iam_role.airflow_ec2.name
+}
+
 # EC2 — Airflow host (t3.micro with 4GB swap)
 resource "aws_instance" "airflow" {
   ami                    = data.aws_ami.amazon_linux_2023.id
-  instance_type          = "t3.micro"
+  instance_type          = "t3.small"
   subnet_id              = var.public_subnet_ids[0]
   vpc_security_group_ids = [var.airflow_sg_id]
   key_name               = var.key_name
+  iam_instance_profile   = aws_iam_instance_profile.airflow_ec2.name
 
   root_block_device {
     volume_size = 30

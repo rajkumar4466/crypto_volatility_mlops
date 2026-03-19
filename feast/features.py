@@ -25,6 +25,7 @@ FEATURE_COLS = [
     "price_range_30m", "sma_10_vs_sma_30", "max_drawdown_30m",
     "candle_body_avg",
     "hour_of_day", "day_of_week",
+    "fear_greed", "market_cap_change_24h", "btc_dominance",
 ]
 
 S3_BUCKET = os.environ.get("FEAST_S3_BUCKET", "your-bucket-name")
@@ -61,6 +62,9 @@ btc_features = FeatureView(
         Field(name="candle_body_avg",  dtype=Float32),
         Field(name="hour_of_day",      dtype=Int32),
         Field(name="day_of_week",      dtype=Int32),
+        Field(name="fear_greed",       dtype=Float32),
+        Field(name="market_cap_change_24h", dtype=Float32),
+        Field(name="btc_dominance",    dtype=Float32),
     ],
     source=btc_source,
     online=True,

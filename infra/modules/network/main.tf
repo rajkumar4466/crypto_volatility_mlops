@@ -215,6 +215,52 @@ resource "aws_security_group" "redis" {
   }
 }
 
+# Private Route Table — used by Lambda subnets (no NAT; VPC endpoints provide S3/DynamoDB access)
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name    = "${var.project_name}-private-rt"
+    Project = var.project_name
+  }
+}
+
+resource "aws_route_table_association" "private_a" {
+  subnet_id      = aws_subnet.private_a.id
+  route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "private_b" {
+  subnet_id      = aws_subnet.private_b.id
+  route_table_id = aws_route_table.private.id
+}
+
+# S3 Gateway VPC Endpoint (free) — Lambda needs S3 for model download
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_route_table.private.id]
+
+  tags = {
+    Name    = "${var.project_name}-s3-endpoint"
+    Project = var.project_name
+  }
+}
+
+# DynamoDB Gateway VPC Endpoint (free) — Lambda needs DynamoDB for prediction logging
+resource "aws_vpc_endpoint" "dynamodb" {
+  vpc_id            = aws_vpc.main.id
+  service_name      = "com.amazonaws.${var.aws_region}.dynamodb"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [aws_route_table.private.id]
+
+  tags = {
+    Name    = "${var.project_name}-dynamodb-endpoint"
+    Project = var.project_name
+  }
+}
+
 # Add Redis egress rule to Lambda SG (after Redis SG is created)
 resource "aws_security_group_rule" "lambda_to_redis" {
   type                     = "egress"

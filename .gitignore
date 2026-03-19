@@ -22,6 +22,13 @@ build/
 .env
 .env.*
 *.env
+.env.local
+
+# Secrets & keys
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Logs
 logs/

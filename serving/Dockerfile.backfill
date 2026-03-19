@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.11
+FROM public.ecr.aws/lambda/python:3.12
 
 # Backfill Lambda only needs boto3 (bundled) and requests
 COPY backfill/requirements.txt ${LAMBDA_TASK_ROOT}

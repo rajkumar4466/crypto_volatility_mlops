@@ -1,9 +1,9 @@
 """
 crypto_volatility_dag.py — Airflow DAG for the crypto volatility MLOps pipeline.
 
-This DAG orchestrates the 7-phase pipeline that runs every 30 minutes:
+This DAG orchestrates the 8-phase pipeline that runs every 30 minutes:
 
-    ingest -> compute_features -> predict -> retrain -> evaluate -> promote -> monitor
+    ingest -> compute_features -> materialize -> predict -> retrain -> evaluate -> promote -> monitor
 
 Trigger Rule Design
 -------------------
@@ -39,7 +39,6 @@ Used by Terraform CloudWatch alarms (not by Python code directly):
     SNS_TOPIC_ARN           — SNS topic ARN for email alerts
 """
 
-import json
 import logging
 import os
 import subprocess
@@ -47,17 +46,9 @@ import sys
 from datetime import datetime, timedelta
 from functools import partial
 
-import boto3
-import pandas as pd
-
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.trigger_rule import TriggerRule
-
-from src.monitoring.accuracy import compute_rolling_accuracy
-from src.monitoring.alerts import publish_metrics
-from src.monitoring.drift import FEATURE_NAMES, compute_drift
-from src.monitoring.retrain_trigger import trigger_retrain_dag
 
 logger = logging.getLogger(__name__)
 
@@ -103,12 +94,14 @@ def run_script(script_name: str, **kwargs) -> None:
 # Monitor task callable (Task 7)
 # ---------------------------------------------------------------------------
 
-def _load_reference_features(s3_bucket: str) -> pd.DataFrame | None:
+def _load_reference_features(s3_bucket: str):
     """Load the reference feature distribution from S3.
 
     Returns None if the reference file does not exist (e.g., first run before
     model promotion has written the reference snapshot).
     """
+    import pandas as pd
+
     s3_key = "features/reference/reference_features.parquet"
     s3_path = f"s3://{s3_bucket}/{s3_key}"
     try:
@@ -125,7 +118,7 @@ def _load_reference_features(s3_bucket: str) -> pd.DataFrame | None:
         return None
 
 
-def _load_recent_features(s3_bucket: str, n_rows: int = 60) -> pd.DataFrame | None:
+def _load_recent_features(s3_bucket: str, n_rows: int = 60):
     """Load recent feature rows from the Feast offline store in S3.
 
     The Feast offline store writes Parquet files partitioned by date under
@@ -135,6 +128,8 @@ def _load_recent_features(s3_bucket: str, n_rows: int = 60) -> pd.DataFrame | No
     Returns None if no feature files are found (pipeline not yet run).
     """
     import io
+    import boto3
+    import pandas as pd
 
     s3_client = boto3.client("s3")
     prefix = "feast/feature_store/"
@@ -175,8 +170,11 @@ def _load_recent_features(s3_bucket: str, n_rows: int = 60) -> pd.DataFrame | No
         return None
 
 
-def _get_model_version(s3_bucket: str) -> str | None:
+def _get_model_version(s3_bucket: str):
     """Read the current champion model version from S3 current_metrics.json."""
+    import json
+    import boto3
+
     s3_client = boto3.client("s3")
     key = "models/current_metrics.json"
     try:
@@ -190,12 +188,14 @@ def _get_model_version(s3_bucket: str) -> str | None:
         return None
 
 
-def _get_prediction_latency_ms() -> float | None:
+def _get_prediction_latency_ms():
     """Read recent Lambda invocation Duration from CloudWatch (last 5 minutes).
 
     Returns the average Duration in milliseconds, or None if CloudWatch data
     is unavailable (e.g., no invocations in the window, cold-start gap).
     """
+    import boto3
+
     cw = boto3.client("cloudwatch")
     end_time = datetime.utcnow()
     start_time = end_time - timedelta(minutes=5)
@@ -245,6 +245,11 @@ def run_monitor(**kwargs) -> None:
             (this task runs with TriggerRule.ALL_DONE and has no downstream dependencies).
     """
     try:
+        from src.monitoring.accuracy import compute_rolling_accuracy
+        from src.monitoring.alerts import publish_metrics
+        from src.monitoring.drift import FEATURE_NAMES, compute_drift
+        from src.monitoring.retrain_trigger import trigger_retrain_dag
+
         s3_bucket = os.environ["S3_BUCKET"]
         predictions_table = os.environ["PREDICTIONS_TABLE_NAME"]
 
@@ -340,7 +345,7 @@ default_args = {
 
 with DAG(
     dag_id="crypto_volatility_pipeline",
-    description="End-to-end crypto volatility MLOps pipeline: ingest → features → predict → retrain → evaluate → promote → monitor",
+    description="End-to-end crypto volatility MLOps pipeline: ingest → features → materialize → predict → retrain → evaluate → promote → monitor",
     schedule_interval="*/30 * * * *",
     catchup=False,
     max_active_runs=1,
@@ -360,7 +365,13 @@ with DAG(
         python_callable=partial(run_script, "compute_features.py"),
     )
 
-    # Task 3: Generate predictions using the current champion model
+    # Task 3: Materialize features from S3 offline store to Redis online store
+    materialize = PythonOperator(
+        task_id="materialize",
+        python_callable=partial(run_script, "materialize.py"),
+    )
+
+    # Task 4: Generate predictions using the current champion model
     predict = PythonOperator(
         task_id="predict",
         python_callable=partial(run_script, "predict.py"),
@@ -403,4 +414,4 @@ with DAG(
     # ---------------------------------------------------------------------------
     # Dependency chain
     # ---------------------------------------------------------------------------
-    ingest >> compute_features >> predict >> retrain >> evaluate >> promote >> monitor
+    ingest >> compute_features >> materialize >> predict >> retrain >> evaluate >> promote >> monitor

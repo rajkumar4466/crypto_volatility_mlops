@@ -38,9 +38,11 @@ module "compute" {
   airflow_sg_id      = module.network.airflow_sg_id
   rds_sg_id          = module.network.rds_sg_id
   redis_sg_id        = module.network.redis_sg_id
-  key_name           = var.ec2_key_name
-  db_username        = var.db_username
-  db_password        = var.db_password
+  key_name            = var.ec2_key_name
+  db_username         = var.db_username
+  db_password         = var.db_password
+  s3_bucket_name      = module.storage.s3_bucket_name
+  dynamodb_table_name = module.storage.dynamodb_table_name
 }
 
 module "serverless" {

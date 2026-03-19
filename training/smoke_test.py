@@ -14,12 +14,12 @@ import numpy as np
 import onnxruntime as rt
 
 
-def smoke_test_onnx(model_path: str, n_features: int = 12) -> bool:
+def smoke_test_onnx(model_path: str, n_features: int = 15) -> bool:
     """Load the ONNX model at model_path and run a single inference to verify output shape.
 
     Args:
         model_path: Filesystem path to the .onnx file.
-        n_features: Expected number of input features (default 12 for btc_features view).
+        n_features: Expected number of input features (default 15 for btc_features view).
 
     Returns:
         True if all assertions pass.
@@ -39,14 +39,11 @@ def smoke_test_onnx(model_path: str, n_features: int = 12) -> bool:
         f"Unexpected label output shape: expected (1,), got {outputs[0].shape}"
     )
 
-    # outputs[1]: list of probability dicts, one dict per sample
-    assert isinstance(outputs[1], list) and len(outputs[1]) == 1, (
-        f"Expected outputs[1] to be a list of length 1, got: {type(outputs[1])} len={len(outputs[1]) if isinstance(outputs[1], list) else 'N/A'}"
-    )
-
-    # Both class keys (0=CALM, 1=VOLATILE) must be present
-    assert 0 in outputs[1][0] and 1 in outputs[1][0], (
-        f"Missing class keys in probability dict; got keys: {list(outputs[1][0].keys())}"
+    # outputs[1]: probability array with shape (1, 2) — columns are [P(CALM), P(VOLATILE)]
+    # With zipmap=False, output is a numpy array instead of list of dicts.
+    probs = outputs[1]
+    assert isinstance(probs, np.ndarray) and probs.shape == (1, 2), (
+        f"Expected outputs[1] to be ndarray of shape (1, 2), got: {type(probs)} shape={getattr(probs, 'shape', 'N/A')}"
     )
 
     return True

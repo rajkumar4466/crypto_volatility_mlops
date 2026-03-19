@@ -155,6 +155,10 @@ Before running `scripts/spin_up.sh`, users must:
 - VPC, subnet IDs, and security group IDs exported for Phase 4 Lambda VPC config
 - ElastiCache free-tier eligibility remains an open concern to verify before spin-up
 
+## Self-Check: PASSED
+
+All 15 required files verified present on disk. Both task commits (d6213ba, a399d0b) confirmed in git log. SUMMARY.md created at `.planning/phases/01-infrastructure-foundation/01-01-SUMMARY.md`.
+
 ---
 *Phase: 01-infrastructure-foundation*
 *Completed: 2026-03-12*

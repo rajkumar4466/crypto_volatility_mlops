@@ -1,0 +1,5 @@
+alert_email  = "rajkumar4466@gmail.com"
+db_password  = "dbpassword"
+ec2_key_name = "my-key"
+aws_region   = "us-east-1"        # optional, default us-east-2
+project_name = "crypto-vol"       # optional, default crypto-vol

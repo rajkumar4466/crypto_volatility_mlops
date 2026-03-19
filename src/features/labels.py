@@ -13,7 +13,7 @@ tests/test_features.py::test_label_no_lookahead.
 """
 import pandas as pd
 
-SWING_THRESHOLD = 0.02  # >2% price swing in next 30 minutes = VOLATILE
+SWING_THRESHOLD = 0.02  # >2% price swing in next 30 candles = VOLATILE
 
 
 def label_volatility(df: pd.DataFrame) -> pd.DataFrame:
@@ -57,7 +57,7 @@ def label_volatility(df: pd.DataFrame) -> pd.DataFrame:
             continue
 
         swing = (future_prices.max() - future_prices.min()) / current_price
-        labels.append("VOLATILE" if swing > SWING_THRESHOLD else "CALM")
+        labels.append(1 if swing > SWING_THRESHOLD else 0)  # 1=VOLATILE, 0=CALM
 
     df["label"] = labels
     # Drop rows with incomplete forward window (last 30 rows)

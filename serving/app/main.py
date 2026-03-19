@@ -33,6 +33,7 @@ FEATURE_NAMES = [
     "rsi_14", "volume_spike", "volume_trend", "price_range_30m",
     "sma_10_vs_sma_30", "max_drawdown_30m", "candle_body_avg",
     "hour_of_day", "day_of_week",
+    "fear_greed", "market_cap_change_24h", "btc_dominance",
 ]
 
 FEATURE_REFS = [f"btc_volatility_features:{name}" for name in FEATURE_NAMES]
@@ -65,10 +66,10 @@ _rendered_yaml = {
     "provider": "aws",
     "online_store": {
         "type": "redis",
-        "connection_string": f"{os.environ['REDIS_HOST']}:6379,ssl=true",
+        "connection_string": f"{os.environ['REDIS_HOST']}:6379",
     },
     "offline_store": {"type": "file"},
-    "entity_key_serialization_version": 2,
+    "entity_key_serialization_version": 3,
 }
 with open("/tmp/feature_store.yaml", "w") as _f:
     yaml.dump(_rendered_yaml, _f)
@@ -106,7 +107,7 @@ def predict():
     try:
         feature_vector = store.get_online_features(
             features=FEATURE_REFS,
-            entity_rows=[{"btc_id": "BTC"}],
+            entity_rows=[{"symbol": "BTCUSDT"}],
         ).to_dict()
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"Feature fetch failed: {exc}") from exc

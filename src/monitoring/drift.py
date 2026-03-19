@@ -19,7 +19,7 @@ from scipy.stats import ks_2samp
 
 logger = logging.getLogger(__name__)
 
-# All 12 feature names — canonical list from src/features/compute.py FEATURE_COLS
+# All 15 feature names — canonical list from src/features/compute.py FEATURE_COLS
 FEATURE_NAMES = [
     "volatility_10m",
     "volatility_30m",
@@ -33,6 +33,9 @@ FEATURE_NAMES = [
     "candle_body_avg",
     "hour_of_day",
     "day_of_week",
+    "fear_greed",
+    "market_cap_change_24h",
+    "btc_dominance",
 ]
 
 _MIN_SAMPLES = 30  # Minimum non-null rows required to run KS-test on a feature

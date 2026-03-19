@@ -43,3 +43,13 @@ variable "db_password" {
   sensitive   = true
   description = "RDS PostgreSQL master password"
 }
+
+variable "s3_bucket_name" {
+  type        = string
+  description = "S3 bucket name for IAM policy"
+}
+
+variable "dynamodb_table_name" {
+  type        = string
+  description = "DynamoDB table name for IAM policy"
+}

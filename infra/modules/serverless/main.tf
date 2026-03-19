@@ -53,7 +53,7 @@ resource "aws_iam_role_policy" "lambda_dynamodb_write" {
     Version = "2012-10-17"
     Statement = [{
       Effect   = "Allow"
-      Action   = ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:GetItem"]
+      Action   = ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:GetItem", "dynamodb:Scan", "dynamodb:Query"]
       Resource = [var.dynamodb_table_arn]
     }]
   })

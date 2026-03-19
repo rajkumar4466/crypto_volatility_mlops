@@ -30,17 +30,19 @@ from xgboost import XGBClassifier
 # ONNX converter registration — MUST happen at module level before any call
 # to convert_sklearn. Missing this causes MissingConverter at conversion time.
 # ---------------------------------------------------------------------------
-from onnxmltools import convert_sklearn
-from onnxmltools.utils import save_model as save_onnx_model
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
-from skl2onnx import update_registered_converter
+from skl2onnx import update_registered_converter, convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+
+from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
 
 update_registered_converter(
     XGBClassifier,
     "XGBoostXGBClassifier",
+    calculate_linear_classifier_output_shapes,
     convert_xgboost,
     parser=None,
+    options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
 )
 
 # ---------------------------------------------------------------------------
@@ -61,6 +63,9 @@ FEATURE_NAMES = [
     "btc_volatility_features:candle_body_avg",
     "btc_volatility_features:hour_of_day",
     "btc_volatility_features:day_of_week",
+    "btc_volatility_features:fear_greed",
+    "btc_volatility_features:market_cap_change_24h",
+    "btc_volatility_features:btc_dominance",
 ]
 FEATURE_COLS = [f.split(":")[1] for f in FEATURE_NAMES]  # strip view prefix
 
@@ -186,16 +191,16 @@ def run_training() -> tuple:
     # 1. W&B init — must come first so run.id is available as correlation key
     # ------------------------------------------------------------------
     param_grid = {
-        "max_depth": [3, 5, 7],
-        "learning_rate": [0.01, 0.1, 0.3],
-        "n_estimators": [50, 100, 200],
-        "subsample": [0.8, 1.0],
+        "max_depth": [3, 5],
+        "learning_rate": [0.01, 0.1],
+        "n_estimators": [50, 100],
+        "subsample": [0.8],
     }
     run = wandb.init(
         project="crypto-volatility-mlops",
         config={
             "param_grid": param_grid,
-            "n_splits": 5,
+            "n_splits": 3,
             "scoring": "f1",
         },
         tags=["training", "xgboost", "phase-3"],
@@ -220,11 +225,18 @@ def run_training() -> tuple:
         #    n_jobs=1 on both GridSearchCV and XGBClassifier: CRITICAL to avoid
         #    OOM on t3.micro (1GB RAM). Do NOT change without profiling.
         # ------------------------------------------------------------------
-        tscv = TimeSeriesSplit(n_splits=5)
+        # Compute class weight to handle imbalance (~63% CALM, ~37% VOLATILE)
+        neg_count = (y_train == 0).sum()
+        pos_count = (y_train == 1).sum()
+        scale_pos_weight = neg_count / pos_count if pos_count > 0 else 1.0
+        print(f"Class balance: CALM={neg_count}, VOLATILE={pos_count}, scale_pos_weight={scale_pos_weight:.2f}")
+
+        tscv = TimeSeriesSplit(n_splits=3)
         clf = XGBClassifier(
             use_label_encoder=False,
             eval_metric="logloss",
-            n_jobs=1,        # CRITICAL: avoid OOM on t3.micro
+            scale_pos_weight=scale_pos_weight,
+            n_jobs=1,        # CRITICAL: avoid OOM on t3.small
             random_state=42,
         )
         grid_search = GridSearchCV(
@@ -253,16 +265,26 @@ def run_training() -> tuple:
         #    Exporting the wrapper silently produces a broken ONNX model.
         # ------------------------------------------------------------------
         n_features = X_train.shape[1]
-        assert n_features == 12, f"Expected 12 features, got {n_features}"
+        assert n_features == 15, f"Expected 15 features, got {n_features}"
         initial_type = [("X", FloatTensorType([None, n_features]))]
 
+        # XGBoost 3.x requires feature names matching 'f%d' for ONNX conversion.
+        # Clone the best estimator and retrain with renamed features.
+        best = grid_search.best_estimator_
+        X_onnx = X_train.copy()
+        X_onnx.columns = [f"f{i}" for i in range(n_features)]
+        best_clone = best.__class__(**best.get_params())
+        best_clone.fit(X_onnx, y_train)
+
         onnx_model = convert_sklearn(
-            grid_search.best_estimator_,   # NOT grid_search itself
+            best_clone,
             initial_types=initial_type,
-            target_opset=15,
+            target_opset={"": 15, "ai.onnx.ml": 3},
+            options={type(best_clone): {"zipmap": False}},
         )
         onnx_path = "/tmp/model.onnx"
-        save_onnx_model(onnx_model, onnx_path)
+        with open(onnx_path, "wb") as f:
+            f.write(onnx_model.SerializeToString())
 
         # ------------------------------------------------------------------
         # 7. Smoke test — must pass before any artifact upload
@@ -270,7 +292,7 @@ def run_training() -> tuple:
         # ------------------------------------------------------------------
         from training.smoke_test import smoke_test_onnx
 
-        smoke_test_onnx(onnx_path, n_features=12)
+        smoke_test_onnx(onnx_path, n_features=15)
 
         # ------------------------------------------------------------------
         # 8. W&B: log scalar metrics + best hyperparams
