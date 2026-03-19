@@ -1,6 +1,8 @@
 # Compute module — EC2 (Airflow), RDS PostgreSQL, ElastiCache Redis
 # BILLABLE resources — spin up/tear down daily
 
+data "aws_caller_identity" "current" {}
+
 # Find latest Amazon Linux 2023 AMI
 data "aws_ami" "amazon_linux_2023" {
   most_recent = true
@@ -51,7 +53,7 @@ resource "aws_iam_role_policy" "airflow_ec2_access" {
       {
         Effect   = "Allow"
         Action   = ["dynamodb:Scan", "dynamodb:Query", "dynamodb:GetItem", "dynamodb:PutItem"]
-        Resource = "arn:aws:dynamodb:*:*:table/${var.dynamodb_table_name}"
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.dynamodb_table_name}"
       },
       {
         Effect   = "Allow"
@@ -61,12 +63,17 @@ resource "aws_iam_role_policy" "airflow_ec2_access" {
       {
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction", "lambda:UpdateFunctionCode"]
-        Resource = "arn:aws:lambda:*:*:function:${var.project_name}-*"
+        Resource = "arn:aws:lambda:${var.aws_region}:${data.aws_caller_identity.current.account_id}:function:${var.project_name}-*"
       },
       {
         Effect   = "Allow"
-        Action   = ["ecr:GetAuthorizationToken", "ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"]
+        Action   = ["ecr:GetAuthorizationToken"]
         Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer", "ecr:BatchCheckLayerAvailability", "ecr:PutImage", "ecr:InitiateLayerUpload", "ecr:UploadLayerPart", "ecr:CompleteLayerUpload"]
+        Resource = "arn:aws:ecr:${var.aws_region}:${data.aws_caller_identity.current.account_id}:repository/${var.project_name}-*"
       }
     ]
   })

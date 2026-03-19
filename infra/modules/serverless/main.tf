@@ -104,11 +104,24 @@ resource "aws_apigatewayv2_api" "main" {
   }
 }
 
-# API Gateway Stage (auto-deploy)
+# API Gateway Stage (auto-deploy) with rate limiting
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.main.id
   name        = "$default"
   auto_deploy = true
+
+  # Default throttle for all routes
+  default_route_settings {
+    throttling_burst_limit = 10   # max concurrent requests
+    throttling_rate_limit  = 5    # requests per second (sustained)
+  }
+
+  # Per-route throttle for /predict (tighter than default)
+  route_settings {
+    route_key              = "GET /predict"
+    throttling_burst_limit = 5    # max 5 concurrent predict calls
+    throttling_rate_limit  = 2    # max 2 predictions per second
+  }
 }
 
 # Lambda integration

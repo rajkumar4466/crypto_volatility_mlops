@@ -43,6 +43,7 @@ module "compute" {
   db_password         = var.db_password
   s3_bucket_name      = module.storage.s3_bucket_name
   dynamodb_table_name = module.storage.dynamodb_table_name
+  aws_region          = var.aws_region
 }
 
 module "serverless" {

@@ -25,6 +25,28 @@ resource "aws_s3_bucket_versioning" "data" {
   }
 }
 
+# Block all public access to S3 bucket
+resource "aws_s3_bucket_public_access_block" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Encrypt S3 bucket at rest with AWS-managed key (SSE-S3, free)
+resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+    bucket_key_enabled = true
+  }
+}
+
 # ECR Repository — Lambda predictor container images
 resource "aws_ecr_repository" "predictor" {
   name                 = "${var.project_name}-predictor"
@@ -60,6 +82,16 @@ resource "aws_dynamodb_table" "predictions" {
   ttl {
     attribute_name = "ttl"
     enabled        = true
+  }
+
+  # Encrypt at rest with AWS-managed key (free)
+  server_side_encryption {
+    enabled = true
+  }
+
+  # Point-in-time recovery for accidental deletes
+  point_in_time_recovery {
+    enabled = true
   }
 
   tags = {

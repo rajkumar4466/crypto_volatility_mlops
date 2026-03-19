@@ -53,3 +53,8 @@ variable "dynamodb_table_name" {
   type        = string
   description = "DynamoDB table name for IAM policy"
 }
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region for scoping IAM policies"
+}
